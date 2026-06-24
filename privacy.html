@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Privacy · Mutually Assured Destruction</title>
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:wght@400;600&family=Inter:wght@400;500&family=IBM+Plex+Mono&display=swap" rel="stylesheet" />
+    <style>
+      body { background: #06080a; color: #e9ecef; font-family: "Inter", system-ui, sans-serif; line-height: 1.7; max-width: 720px; margin: 0 auto; padding: 4rem 1.5rem; }
+      h1 { font-family: "Source Serif 4", serif; font-weight: 600; font-size: 2.2rem; }
+      h2 { font-family: "Source Serif 4", serif; font-weight: 600; font-size: 1.3rem; margin-top: 2.2rem; }
+      p, li { color: #8593a0; }
+      b { color: #e9ecef; }
+      a { color: #6ec7e8; }
+      .eyebrow { font-family: "IBM Plex Mono", monospace; font-size: .7rem; letter-spacing: .2em; text-transform: uppercase; color: #ff6b35; }
+      .back { display: inline-block; margin-top: 2.5rem; font-family: "IBM Plex Mono", monospace; font-size: .8rem; }
+    </style>
+  </head>
+  <body>
+    <div class="eyebrow">Mutually Assured Destruction</div>
+    <h1>Privacy</h1>
+    <p>Plain language, because that is the only kind worth writing. Last updated June 2026.</p>
+
+    <h2>What we collect</h2>
+    <p>Almost nothing. The artwork is a static page. It sets no advertising or tracking cookies and runs no analytics without your consent.</p>
+    <ul>
+      <li><b>Coalition sign-up:</b> if you add your voice, we store the priorities you ranked and the country you selected. An email address is <b>optional</b> — leave it blank to take part anonymously. We will never sell or share it; it is used only to send you Blueprint and Six Degrees updates if you ticked the box.</li>
+      <li><b>No account, no profile, no third-party trackers.</b></li>
+    </ul>
+
+    <h2>Your location ("Your area")</h2>
+    <p>The hazard feed is <b>opt-in</b>. Nothing happens until you press "Show what's happening near me" or type a place into the search box.</p>
+    <ul>
+      <li>Your coordinates are used <b>only</b> to query public hazard services as a radius or bounding-box, and are <b>never sent to us</b> or to any other party.</li>
+      <li>Those services are: <a href="https://www.gdacs.org/" target="_blank" rel="noopener">GDACS</a>, <a href="https://earthquake.usgs.gov/" target="_blank" rel="noopener">USGS</a>, <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (weather + air quality), and, where configured, <a href="https://firms.modaps.eosdis.nasa.gov/" target="_blank" rel="noopener">NASA FIRMS</a>. Each receives only the location you are querying about, the same as any weather site.</li>
+      <li>Your coordinates are held in memory for the session only. Nothing is written to a server. Polling pauses when the tab is hidden and stops when you leave.</li>
+    </ul>
+
+    <h2>Where the data lives</h2>
+    <p>The site is hosted on GitHub Pages. Coalition sign-ups, when the backend is enabled, are stored in a locked-down Supabase table that accepts only the fields above. Until then, sign-ups live only in your own browser's local storage.</p>
+
+    <h2>Your choices</h2>
+    <p>To remove a coalition sign-up, or for any correction, email <a href="mailto:hello@studioex.co">hello@studioex.co</a>.</p>
+
+    <a class="back" href="index.html">← Back to the artwork</a>
+  </body>
+</html>

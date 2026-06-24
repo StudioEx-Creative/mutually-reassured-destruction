@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mutually Assured Destruction · Blueprint × StudioEX</title>
+    <meta name="description" content="Every second, the burning of fossil fuels releases 1,208 tonnes of CO₂. An interactive data artwork about the planetary bill of carbon — and the ledger of choices that produced it." />
+    <meta name="author" content="Blueprint × StudioEX" />
+    <link rel="canonical" href="https://studioex-creative.github.io/Mututally-reassured-destruction/" />
+
+    <meta property="og:title" content="Mutually Assured Destruction" />
+    <meta property="og:description" content="The planet keeps its own books, and every one of them is breaking. A climate companion to The Cost of War." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://studioex-creative.github.io/Mututally-reassured-destruction/assets/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Mutually Assured Destruction" />
+    <meta name="twitter:description" content="The planetary bill of carbon, and the ledger of choices that produced it. Blueprint × StudioEX, 2026." />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..600&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css?v=2026r1" />
+  </head>
+  <body>
+    <a class="skip-link" href="#record">Skip to the content</a>
+    <canvas id="bg" aria-hidden="true"></canvas>
+
+    <!-- ═══ PROLOGUE · THE TICKER ═══ -->
+    <header class="hero">
+      <a class="hero-logo fade-up" href="https://www.studioex.co" target="_blank" rel="noopener" aria-label="Blueprint × StudioEX">
+        <img src="assets/blueprint-logo-white.png" alt="Blueprint" onerror="this.style.display='none'" />
+        <span>× <b>StudioEX</b></span>
+      </a>
+      <div class="hero-eyebrow eyebrow fade-up d1">An interactive data artwork · Blueprint × StudioEX · 2026</div>
+      <h1 class="hero-title fade-up d2">Mutually<br /><em class="mad-ember">Assured</em><br />Destruction</h1>
+      <p class="hero-sub fade-up d3">
+        The planet keeps its own books, and every one of them is breaking. This page
+        counts the bill of carbon — and the ledger of choices that produced it. Then it
+        asks one thing of you.
+      </p>
+
+      <section class="ticker fade-up d4" aria-label="Live carbon counter">
+        <div class="ticker-lbl">Since you opened this page, fossil fuels have released</div>
+        <div class="ticker-num" id="ticker">0</div>
+        <div class="ticker-foot">
+          tonnes of <b>CO₂</b> — about <b>1,208 tonnes every second</b>, still rising.
+          <span class="ticker-src"><a href="https://globalcarbonbudget.org/" target="_blank" rel="noopener">Global Carbon Project 2025 · 38.1 Gt/yr ↗</a></span>
+        </div>
+      </section>
+      <div class="scroll-cue fade-up d5">▼ &nbsp; scroll &nbsp; ▼</div>
+    </header>
+
+    <!-- ═══ CHAPTER NAV ═══ -->
+    <nav class="itin rv" aria-label="Chapters">
+      <div class="itin-track">
+        <a class="itin-item" href="#record"><span class="itin-n">01</span><span><span class="itin-t">The Record</span><span class="itin-d">what is happening</span></span></a>
+        <a class="itin-item ice" href="#map"><span class="itin-n">02</span><span><span class="itin-t">The Map</span><span class="itin-d">where it is happening</span></span></a>
+        <a class="itin-item" href="#ledger"><span class="itin-n">03</span><span><span class="itin-t">The Ledger</span><span class="itin-d">who is causing it</span></span></a>
+        <a class="itin-item ice" href="#forecast"><span class="itin-n">04</span><span><span class="itin-t">The Forecast</span><span class="itin-d">what it becomes</span></span></a>
+        <a class="itin-item act" href="#say"><span class="itin-n">▾</span><span><span class="itin-t">Then it's your turn</span><span class="itin-d">priorities · your area · your letter</span></span></a>
+      </div>
+    </nav>
+
+    <main id="main">
+      <!-- ═══ CH 01 · THE RECORD ═══ -->
+      <section class="section" id="record">
+        <div class="wrap">
+          <div class="chapter-num rv">Chapter 01 · The Record</div>
+          <h2 class="sec-title ember rv">The planet keeps its own books. <em>Every one of them is breaking.</em></h2>
+          <p class="sec-desc rv rv-d1">
+            These are the canonical indicators of a changing climate, each drawn from the
+            agency that measures it. Tap any card for its full record, its method, and its
+            source. <b>Ember</b> marks the carbon and the heat; <b>ice</b> marks the
+            cryosphere and the ocean absorbing it.
+          </p>
+
+          <div class="record-toolbar rv rv-d1" role="group" aria-label="Sort indicators">
+            <span class="lbl">Sort</span>
+            <button class="sortbtn on" data-sort="departure">Most off-baseline</button>
+            <button class="sortbtn" data-sort="accel">Fastest accelerating</button>
+            <button class="sortbtn" data-sort="alpha">Alphabetical</button>
+          </div>
+
+          <div class="card-grid rv rv-d2" id="cardGrid"></div>
+
+          <!-- heat stripes -->
+          <div class="stripes-block rv">
+            <div class="stripes-h">The warming stripes · global temperature, 1850–2025</div>
+            <div class="stripes" id="stripes" role="img" aria-label="Heat stripes showing global temperature rising from blue (cool) in 1850 to deep red (hot) in 2025"></div>
+            <div class="stripes-axis"><span>1850</span><span>1920</span><span>1970</span><span>2025</span></div>
+            <p class="stripes-cap">
+              Each stripe is one year, coloured by its temperature against the
+              1850–1900 average. The visual concept is Ed Hawkins'
+              <a href="https://showyourstripes.info/" target="_blank" rel="noopener">#ShowYourStripes</a>;
+              data follows the Berkeley Earth annual record.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- ═══ CH 02 · THE MAP ═══ -->
+      <section class="section" id="map">
+        <div class="wrap">
+          <div class="chapter-num rv" style="color: var(--ice)">Chapter 02 · The Map</div>
+          <h2 class="sec-title ice rv">It is not happening evenly. <em>But it is happening everywhere.</em></h2>
+          <p class="sec-desc rv rv-d1">
+            Warming is not uniform: land heats faster than ocean, and the Arctic faster than
+            anywhere. The band below shows how far each latitude has departed from its
+            1951–1980 normal. The live map of hazards near <em>you</em> waits in the final
+            chapter.
+          </p>
+          <div class="anomaly-wrap rv rv-d1" id="anomalyWrap"></div>
+          <div class="anomaly-legend rv rv-d2">
+            <span>cooler</span><span class="anomaly-scale" aria-hidden="true"></span><span>warmer</span>
+            <span style="margin-left:auto">latitudinal temperature anomaly vs 1951–1980</span>
+          </div>
+          <p class="map-note rv rv-d2">
+            A full live hazard map (active fires, floods, cyclones, droughts) is wired into
+            <a href="#area">Your area</a> below, drawing on
+            <a href="https://www.gdacs.org/" target="_blank" rel="noopener">GDACS</a>,
+            <a href="https://firms.modaps.eosdis.nasa.gov/" target="_blank" rel="noopener">NASA FIRMS</a>,
+            <a href="https://earthquake.usgs.gov/" target="_blank" rel="noopener">USGS</a> and
+            <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>.
+            Source for this band: <a href="https://data.giss.nasa.gov/gistemp/" target="_blank" rel="noopener">NASA GISS zonal anomalies ↗</a>.
+          </p>
+        </div>
+      </section>
+
+      <!-- ═══ CH 03 · THE LEDGER ═══ -->
+      <section class="section" id="ledger">
+        <div class="wrap">
+          <div class="chapter-num rv">Chapter 03 · The Ledger</div>
+          <h2 class="sec-title ember rv">The atmosphere does not care who emitted. <em>The record does.</em></h2>
+          <p class="sec-desc rv rv-d1">
+            Responsibility is not evenly shared. Here is the bill by nation, by corporation,
+            and by the policy choices made along the way.
+          </p>
+
+          <div class="sub-h rv">03a · States</div>
+          <div class="sub-t rv">Who put the carbon there</div>
+          <div class="ledger-tabs rv rv-d1" role="group" aria-label="Emissions view">
+            <button class="ledger-tab on" data-view="cumPct">Cumulative since 1850</button>
+            <button class="ledger-tab" data-view="annPct">Annual (2024)</button>
+            <button class="ledger-tab" data-view="perCap">Per person</button>
+          </div>
+          <div class="bars rv rv-d1" id="statesBars"></div>
+          <p class="map-note rv rv-d2" id="statesNote"></p>
+
+          <div class="sub-h rv">03b · Corporations</div>
+          <div class="sub-t rv">The Carbon Majors</div>
+          <div class="majors-stat rv rv-d1">
+            <div class="big" id="majorsBig"></div>
+            <div class="body" id="majorsBody"></div>
+          </div>
+          <div class="majors-list rv rv-d1" id="majorsList"></div>
+          <div class="majors-stat rv rv-d2" style="background: rgba(110,199,232,.03)">
+            <div class="big" style="color: var(--ice)" id="subsidyBig"></div>
+            <div class="body" id="subsidyBody"></div>
+          </div>
+
+          <div class="sub-h rv">03c · Policy &amp; Lobbying</div>
+          <div class="sub-t rv">Thirty years of choosing</div>
+          <div class="timeline rv rv-d1" id="timeline"></div>
+          <p class="lobby-note map-note rv rv-d2" id="lobbyNote"></p>
+          <div class="news-feed rv rv-d2" id="newsFeed"></div>
+        </div>
+      </section>
+
+      <!-- ═══ CH 04 · THE FORECAST ═══ -->
+      <section class="section" id="forecast">
+        <div class="wrap">
+          <div class="chapter-num rv" style="color: var(--ice)">Chapter 04 · The Forecast</div>
+          <h2 class="sec-title ice rv">None of this is prophecy. <em>All of it is arithmetic, conditional on choice.</em></h2>
+          <p class="sec-desc rv rv-d1">
+            Pick a future and a pathway. Every projected number carries its scenario name and
+            its uncertainty range. We never freehand a projection — these come from the IPCC,
+            Climate Action Tracker, and the IEA.
+          </p>
+
+          <div class="forecast-controls rv rv-d1">
+            <div class="fc-group">
+              <span class="fc-lbl">Horizon</span>
+              <div class="fc-btns" id="horizonBtns" role="group" aria-label="Time horizon">
+                <button class="fc-btn ice" data-h="2030">2030</button>
+                <button class="fc-btn ice on" data-h="2050">2050</button>
+                <button class="fc-btn ice" data-h="2100">2100</button>
+              </div>
+            </div>
+            <div class="fc-group">
+              <span class="fc-lbl">Pathway · left vs right</span>
+              <div class="fc-btns" id="scenarioBtns" role="group" aria-label="Scenario comparison"></div>
+            </div>
+          </div>
+
+          <div class="forecast-main rv rv-d2">
+            <article class="forecast-card" id="cardA"></article>
+            <article class="forecast-card" id="cardB"></article>
+          </div>
+
+          <div class="forecast-compare rv rv-d2" id="forecastCompare"></div>
+          <p class="map-note rv rv-d2">
+            Sources: <a href="https://www.ipcc.ch/report/ar6/syr/" target="_blank" rel="noopener">IPCC AR6 ↗</a> ·
+            <a href="https://climateactiontracker.org/global/temperatures/" target="_blank" rel="noopener">Climate Action Tracker (Nov 2025) ↗</a> ·
+            <a href="https://www.iea.org/reports/world-energy-outlook-2025" target="_blank" rel="noopener">IEA WEO 2025 ↗</a>.
+            SSP5-8.5 is shown only as an upper-bound stress test; the IPCC notes it is no longer the most likely trajectory.
+          </p>
+        </div>
+      </section>
+    </main>
+
+    <!-- the breath -->
+    <div class="breath">
+      <p class="rv">Every number on this page<br />is a choice still open.</p>
+    </div>
+
+    <!-- ═══ CODA · HAVE YOUR SAY ═══ -->
+    <div class="coda-divider" id="say">
+      <div class="coda-eyebrow"><span class="live-dot"></span>Have your say</div>
+      <div class="coda-title">What if we chose <em>differently?</em></div>
+      <p class="coda-lead">
+        Nations, corporations and consumers are locked into a system whose endpoint is
+        collective. Only collective will breaks it. The technologies exist. The money exists.
+        What is missing is the instruction, from people to the governments who answer to them.
+        <b>This is where you give it.</b>
+      </p>
+    </div>
+
+    <!-- STEP 01 · PRIORITIES -->
+    <section class="coda-step" id="prioritiesStep">
+      <div class="wrap">
+        <div class="step-label">Step 01 · Your priorities</div>
+        <h2 class="sec-title ice rv">What would you have your government do <em>first?</em></h2>
+        <p class="sec-desc rv rv-d1">
+          Tap the actions you'd demand, <b>in order — your most urgent first</b>. The order you
+          choose is your ranking. Each is drawn from the IPCC's mitigation portfolio and the
+          IEA's net-zero roadmap.
+        </p>
+        <div class="prio-grid rv rv-d1" id="prioGrid"></div>
+        <div class="prio-panel rv rv-d2" id="prioPanel">
+          <div class="prio-panel-h">
+            <span>Your priorities, in order</span>
+            <span class="hint">use ↑ ↓ to reorder · most urgent first</span>
+          </div>
+          <div class="ordered" id="orderedList"><div class="ordered-empty">Nothing chosen yet. Tap an action above to begin.</div></div>
+        </div>
+        <div class="continue-wrap">
+          <button class="continue-btn" id="toAreaBtn" onclick="goToStep('areaStep')">Continue → Your area <span class="ar">▾</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 02 · YOUR AREA (live hazard feed) -->
+    <section class="coda-step" id="areaStep">
+      <div class="wrap" id="area">
+        <div class="step-label">Step 02 · Your area</div>
+        <h2 class="sec-title rv" style="color:#fff">What's happening <em style="color:var(--ember)">near you</em></h2>
+        <p class="area-intro rv rv-d1">
+          With your permission, this shows recent hazards around you — fires, quakes, severe
+          weather — and how today's temperature compares with your local normal. Your
+          coordinates are used only to query public hazard APIs as a bounding box, and are
+          never sent anywhere else.
+        </p>
+        <div class="area-controls rv rv-d1">
+          <button class="btn btn-primary" id="geoBtn" onclick="requestLocation()">Show what's happening near me</button>
+          <input class="area-search" id="areaSearch" type="text" placeholder="…or type a city / place" aria-label="Search a place" />
+          <div class="radius-btns" role="group" aria-label="Search radius">
+            <button class="radius-btn" data-r="50" onclick="setRadius(50)">50 km</button>
+            <button class="radius-btn on" data-r="250" onclick="setRadius(250)">250 km</button>
+            <button class="radius-btn" data-r="1000" onclick="setRadius(1000)">1000 km</button>
+          </div>
+        </div>
+        <div class="area-status rv" id="areaStatus" aria-live="polite"></div>
+        <div class="area-local-temp rv" id="areaTemp"></div>
+        <div class="area-feed rv" id="areaFeed" aria-live="polite"></div>
+        <p class="privacy-note rv">
+          Opt-in only. Polling pauses when this tab is hidden. Coordinates never leave your
+          browser except as bounding-box queries to the hazard providers themselves
+          (GDACS, NASA FIRMS, USGS, Open-Meteo, OpenAQ). See the
+          <a href="privacy.html" target="_blank" rel="noopener">privacy policy</a>.
+        </p>
+        <div class="continue-wrap">
+          <button class="continue-btn" onclick="goToStep('letterStep')">Continue → Write the letter <span class="ar">▾</span></button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 03 · THE LETTER -->
+    <section class="coda-step" id="letterStep">
+      <div class="wrap">
+        <div class="step-label">Step 03 · Your letter</div>
+        <h2 class="sec-title ice rv">Write the <em>letter</em></h2>
+        <p class="sec-desc rv rv-d1">
+          A letter to your head of state, pre-written from your choices and editable in full.
+          Civil, specific, citizen to representative.
+        </p>
+        <div class="letter-note" id="letterNote">⚠ The highlighted parts need your input. Rank your priorities in Step 01 and pick your country below to complete the letter.</div>
+
+        <div style="margin-bottom:1.4rem" class="rv rv-d1">
+          <label class="fc-lbl" for="countrySelect" style="display:block;margin-bottom:.5rem">Your country</label>
+          <select class="country-select" id="countrySelect" onchange="showCountry(this.value)">
+            <option value="">Select your country…</option>
+          </select>
+          <div class="country-card" id="countryCard"></div>
+        </div>
+
+        <div class="letter-fields rv rv-d1">
+          <input class="field-inp" type="text" id="letterName" placeholder="Your name (optional, defaults to 'A concerned citizen')" oninput="generateLetter()" />
+          <input class="field-inp" type="text" id="letterLeader" placeholder="Your leader's name / title (e.g. Prime Minister …)" oninput="generateLetter()" />
+        </div>
+        <div class="letter-wrap rv rv-d1">
+          <div class="letter-toolbar">
+            <span class="letter-toolbar-label">Your letter · editable</span>
+            <div>
+              <button class="tool-btn" onclick="copyLetter()">Copy</button>
+              <button class="tool-btn" onclick="emailLetter()">Email</button>
+              <button class="tool-btn" onclick="tweetLetter()">Post to X</button>
+            </div>
+          </div>
+          <div class="letter-body" id="letterOutput" contenteditable="true" spellcheck="true" aria-label="Editable letter"></div>
+        </div>
+        <div class="letter-contact-note" id="letterContact"></div>
+        <div class="letter-primary">
+          <button class="continue-btn" onclick="sendToRepresentative()">✉ Send this letter to your representative</button>
+        </div>
+        <div class="letter-secondary">
+          <button class="link-btn" onclick="generateShareCard()">Generate shareable card</button>
+          <span class="link-sep">·</span>
+          <button class="link-btn" onclick="goToStep('coalitionStep')">Skip to the coalition</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEP 04 · COALITION -->
+    <section class="coda-step" id="coalitionStep" style="border-bottom:none">
+      <div class="wrap">
+        <div class="step-label">Step 04 · The coalition</div>
+        <h2 class="sec-title ice rv">Join the <em>coalition</em></h2>
+        <p class="sec-desc rv rv-d1"><span class="live-dot"></span> People demanding the same of their governments, from around the world. Add your voice to the global tally.</p>
+
+        <div class="globe-block rv rv-d1">
+          <div class="globe-h">The coalition, lighting up the map</div>
+          <div class="globe-sub">Each bar is a country's voices. Drag to spin · scroll to zoom.</div>
+          <div class="globe-wrap" id="globeWrap"><div class="globe-loading" id="globeLoading">rendering the globe…</div></div>
+        </div>
+
+        <div class="coalition-layout rv rv-d1">
+          <div>
+            <div class="coalition-num" id="coalitionNum">—</div>
+            <div class="coalition-suffix">voices for collective action</div>
+            <div class="coalition-form">
+              <input class="field-inp" type="email" id="coalitionEmail" placeholder="Your email (optional — for Blueprint & Six Degrees updates)" style="width:100%" />
+              <label class="consent-row">
+                <input type="checkbox" id="coalitionConsent" />
+                <span>Email me Blueprint &amp; Six Degrees updates. I agree to the <a href="privacy.html" target="_blank" rel="noopener">privacy policy</a>. (Leave the box and email blank to take part anonymously.)</span>
+              </label>
+              <div id="turnstileBox"></div>
+              <button class="btn btn-primary" style="width:100%" onclick="submitCoalition()">Add my voice + generate my card</button>
+              <div class="coalition-thanks" id="coalitionThanks">✓ Added to the coalition. Your card is ready below.</div>
+            </div>
+          </div>
+          <div class="global-prio" id="globalPrio"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ DISCLAIMER ═══ -->
+    <div class="disclaimer">
+      <details class="disc-box">
+        <summary class="disc-title">Methodology &amp; disclaimer ▾</summary>
+        <div class="disc-text">
+          A work of data art and advocacy, not a policy document. The climate is a system of
+          staggering complexity, and every projection here carries uncertainty that we have
+          tried to surface, not hide. The point is not the precision of any single number; it
+          is the direction of all of them taken together. We have not invented or inflated any
+          figure; all data was verified against primary sources in June 2026. Where authoritative
+          sources disagree, we use the most recent peer-reviewed value and note the disagreement.
+          Full sources, retrieval dates and refresh notes are in the project's
+          <a href="DATA-SOURCES.md" target="_blank" rel="noopener">DATA-SOURCES file</a>.
+        </div>
+      </details>
+    </div>
+
+    <div class="closing-line">
+      The world is not simple.<br />But the arithmetic of carbon is, and so is the choice it leaves us.
+    </div>
+
+    <!-- ═══ STUDIO ═══ -->
+    <div class="studio">
+      <div class="st-row">
+        <img class="st-logo" src="assets/blueprint-logo-white.png" alt="Blueprint" onerror="this.style.display='none'" />
+        <span class="st-x">×</span>
+        <span class="st-wm">StudioEX</span>
+      </div>
+      <div class="st-sub">An artwork by Blueprint · Produced by StudioEX · 2026</div>
+      <div class="st-links">
+        <a href="https://www.thesixdegrees.co" target="_blank" rel="noopener">The Six Degrees Project</a>
+        <a href="https://www.studioex.co" target="_blank" rel="noopener">StudioEX</a>
+        <a href="https://studioex-creative.github.io/cost-of-war/" target="_blank" rel="noopener">The Cost of War</a>
+        <a href="mailto:hello@studioex.co">Contact / corrections</a>
+        <a href="privacy.html">Privacy</a>
+      </div>
+    </div>
+
+    <footer>
+      <p>
+        Primary sources:
+        <a href="https://globalcarbonbudget.org/" target="_blank" rel="noopener">Global Carbon Project</a> ·
+        <a href="https://gml.noaa.gov/ccgg/trends/" target="_blank" rel="noopener">NOAA GML</a> ·
+        <a href="https://climate.copernicus.eu/" target="_blank" rel="noopener">Copernicus C3S</a> ·
+        <a href="https://data.giss.nasa.gov/gistemp/" target="_blank" rel="noopener">NASA GISS</a> ·
+        <a href="https://nsidc.org/" target="_blank" rel="noopener">NSIDC</a> ·
+        <a href="https://www.wri.org/" target="_blank" rel="noopener">WRI / Global Forest Watch</a> ·
+        <a href="https://carbonmajors.org/" target="_blank" rel="noopener">Carbon Majors</a> ·
+        <a href="https://climateactiontracker.org/" target="_blank" rel="noopener">Climate Action Tracker</a> ·
+        <a href="https://www.ipcc.ch/" target="_blank" rel="noopener">IPCC</a> ·
+        <a href="https://www.worldweatherattribution.org/" target="_blank" rel="noopener">World Weather Attribution</a>
+      </p>
+    </footer>
+
+    <!-- ═══ INDICATOR DETAIL PANEL ═══ -->
+    <div class="detail-ov" id="detailOv" role="dialog" aria-modal="true" aria-labelledby="detailTitle">
+      <div class="detail-box" id="detailBox">
+        <button class="detail-close" onclick="closeDetail()" aria-label="Close">Close ✕</button>
+        <div class="eyebrow" id="detailFam" style="margin-bottom:.6rem"></div>
+        <h3 id="detailTitle"></h3>
+        <div class="detail-val" id="detailVal"></div>
+        <svg class="detail-chart" id="detailChart" viewBox="0 0 560 160" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <p class="detail-method" id="detailMethod"></p>
+        <div class="detail-src" id="detailSrc"></div>
+      </div>
+    </div>
+
+    <!-- ═══ SHARE CARD OVERLAY ═══ -->
+    <div class="sc-overlay" id="scOverlay" role="dialog" aria-modal="true" aria-label="Shareable card">
+      <div class="sc-modal">
+        <div id="shareCard">
+          <div>
+            <div class="sc-eyebrow">Mutually Assured Destruction · 2026</div>
+            <div class="sc-logo">Blueprint × StudioEX</div>
+          </div>
+          <div class="sc-headline" id="scHeadline">I'm choosing to break the lock.</div>
+          <div class="sc-issues" id="scIssues"></div>
+          <div class="sc-divider"></div>
+          <div style="display:flex;justify-content:space-between;gap:1rem">
+            <div><div class="sc-stat" id="scStat">38.1 Gt</div><div class="sc-stat-sub">fossil CO₂ a year, and rising</div></div>
+            <div><div class="sc-stat" style="color:var(--ice)" id="scStat2">~4 years</div><div class="sc-stat-sub">of budget left for 1.5 °C</div></div>
+          </div>
+          <div class="sc-divider"></div>
+          <div class="sc-footer-row">
+            <div id="scCountry">studioex.co</div>
+            <div style="text-align:right">@404blueprint<br />#MutuallyAssuredDestruction</div>
+          </div>
+        </div>
+        <div class="sc-actions">
+          <button class="btn btn-primary" onclick="downloadCard()">↓ Download PNG</button>
+          <button class="btn" onclick="shareCardTo('twitter')">Post to X</button>
+          <button class="btn" onclick="shareCardTo('copy')">Copy link</button>
+        </div>
+        <span class="sc-close" onclick="document.getElementById('scOverlay').classList.remove('open')">Close</span>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/config.js?v=2026r1"></script>
+    <script src="js/data.js?v=2026r1"></script>
+    <script src="js/backend.js?v=2026r1"></script>
+    <script src="js/hazard.js?v=2026r1"></script>
+    <script src="js/main.js?v=2026r1"></script>
+  </body>
+</html>
