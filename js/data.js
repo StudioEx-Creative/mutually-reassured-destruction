@@ -36,8 +36,16 @@ const ICE_PER_SECOND = (ICE_LOSS_GT * 1e9) / SECONDS_PER_YEAR;   // ≈ 12,999 t
 const FOREST_HA_2024 = 6.7e6;          // tropical primary forest, ha, GFW/WRI 2024
 const FOREST_PER_SECOND = FOREST_HA_2024 / SECONDS_PER_YEAR;     // ≈ 0.21 ha/s
 
-/* The remaining carbon budget — the most important number on the page. */
+/* The remaining carbon budget — the most important number on the page.
+   GCP 2025 puts the remaining budget for a 50% chance of 1.5 °C at roughly
+   four years at 2025 emission levels. We anchor the live countdown to the
+   start of 2025 + 4 years = 2029-01-01 and always carry the 50% caveat. */
 const BUDGET_YEARS_1P5 = 4;            // GCP 2025: ~4 years at 2025 emission levels
+const BUDGET_PROB = "50% chance";      // probability caveat (GCP remaining-budget table)
+const BUDGET_EXHAUST_DATE = "2029-01-01T00:00:00Z";
+
+/* Forest ticker: latest tropical primary-forest loss ÷ minutes per year. */
+const FOREST_HA_PER_MIN = FOREST_HA_2024 / 525600; // ≈ 12.75 ha/min, GFW/WRI 2024
 
 /* ═══ SOURCE MANIFEST ══════════════════════════════════════════════
    Three layers of attribution all read from here. `d` = access date. */
@@ -313,6 +321,7 @@ const SCENARIOS = [
     color: "ember",
     horizons: {
       2030: { temp: "≈1.5 °C", sl: "+0.10 m", note: "1.5 °C crossed in long-term terms" },
+      2040: { temp: "≈1.8 °C", sl: "+0.17 m", note: "Interpolated from CAT / IEA STEPS 2030 and 2050 values" },
       2050: { temp: "≈2.0 °C", sl: "+0.25 m", note: "Arctic summers ice-free in some years" },
       2100: { temp: "≈2.6 °C", sl: "+0.6–0.8 m", note: "Most coral reefs lost; widespread chronic heat" },
     },
@@ -325,6 +334,7 @@ const SCENARIOS = [
     color: "ember",
     horizons: {
       2030: { temp: "≈1.5 °C", sl: "+0.10 m", note: "Targets so far don't change the 1.5 °C outlook" },
+      2040: { temp: "≈1.7 °C", sl: "+0.17 m", note: "Interpolated from CAT / IEA APS 2030 and 2050 values" },
       2050: { temp: "≈1.9 °C", sl: "+0.24 m", note: "Net zero promised by mid-century by many, not all" },
       2100: { temp: "≈2.6 °C", sl: "+0.5–0.7 m", note: "Pledges have moved the needle by ~0.1 °C in four years" },
     },
@@ -337,6 +347,7 @@ const SCENARIOS = [
     color: "ice",
     horizons: {
       2030: { temp: "≈1.5 °C", sl: "+0.09 m", note: "Emissions must fall ~43% from 2019 by 2030" },
+      2040: { temp: "≈1.5 °C", sl: "+0.15 m", note: "Interpolated from IPCC SSP1-1.9 / IEA NZE 2030 and 2050 values" },
       2050: { temp: "≈1.5 °C", sl: "+0.20 m", note: "Global net-zero CO₂ reached" },
       2100: { temp: "≈1.4 °C", sl: "+0.3–0.6 m", note: "Warming peaks and slowly declines" },
     },
@@ -349,6 +360,7 @@ const SCENARIOS = [
     color: "ember",
     horizons: {
       2030: { temp: "≈1.6 °C", sl: "+0.11 m", note: "Diverges sharply after mid-century" },
+      2040: { temp: "≈2.0 °C", sl: "+0.20 m", note: "Interpolated from IPCC AR6 SSP5-8.5 2030 and 2050 values" },
       2050: { temp: "≈2.4 °C", sl: "+0.29 m", note: "Reefs functionally gone; major ice loss locked in" },
       2100: { temp: "≈4.4 °C", sl: "+0.6–1.0 m", note: "Up to ~2 m by 2100 cannot be ruled out (low confidence)" },
     },
@@ -452,3 +464,53 @@ const SEED_COUNTRY_SIGNUPS = {
 const SEED_PRIORITY_WEIGHTS = [820, 540, 470, 760, 690, 520, 410, 480, 380, 360, 610, 430];
 
 const MAD_SEED_COUNT = 4120; // base shown before/under real submissions
+
+/* ═══ CHAPTER 02 · THE MAP — DATA ══════════════════════════════════ */
+
+/* World Weather Attribution rapid studies (curated, 2022–2025). Each pin:
+   { lat, lng, title, year, finding, url }. Findings summarise WWA's
+   communicated conclusion; each links to worldweatherattribution.org.
+   The scrubber filters to studies in/at-or-before the selected year. */
+const WWA_STUDIES = [
+  { lat: 27.0, lng: 68.0, title: "Pakistan floods", year: 2022, finding: "Extreme monsoon rainfall made more intense by climate change.", url: "https://www.worldweatherattribution.org/" },
+  { lat: 45.0, lng: 6.0, title: "Southern Europe heatwave", year: 2023, finding: "Heat of this intensity virtually impossible without human-caused warming.", url: "https://www.worldweatherattribution.org/" },
+  { lat: 31.0, lng: -100.0, title: "US & Mexico heat dome", year: 2023, finding: "Made about 5× more likely by climate change.", url: "https://www.worldweatherattribution.org/" },
+  { lat: 35.0, lng: 110.0, title: "China heatwave", year: 2023, finding: "Made at least 50× more likely by climate change.", url: "https://www.worldweatherattribution.org/" },
+  { lat: 32.76, lng: 22.64, title: "Libya floods (Storm Daniel)", year: 2023, finding: "Heavy rainfall up to 50× more likely; thousands killed in Derna.", url: "https://www.worldweatherattribution.org/" },
+  { lat: 54.0, lng: -110.0, title: "Canada wildfire season", year: 2023, finding: "Fire-weather conditions made over twice as likely by warming.", url: "https://www.worldweatherattribution.org/" },
+  { lat: -4.0, lng: -62.0, title: "Amazon drought", year: 2023, finding: "Climate change the main driver of the exceptional drought.", url: "https://www.worldweatherattribution.org/" },
+  { lat: 4.0, lng: 42.0, title: "Horn of Africa drought", year: 2023, finding: "Made far more severe by climate change.", url: "https://www.worldweatherattribution.org/" },
+  { lat: -30.0, lng: -53.0, title: "Brazil floods (Rio Grande do Sul)", year: 2024, finding: "Extreme rainfall made roughly twice as likely.", url: "https://www.worldweatherattribution.org/" },
+  { lat: 35.0, lng: -82.0, title: "Hurricane Helene", year: 2024, finding: "Rainfall intensified; warmer seas fuelled rapid intensification.", url: "https://www.worldweatherattribution.org/" },
+  { lat: 39.5, lng: -0.4, title: "Valencia floods (DANA)", year: 2024, finding: "Extreme rainfall made about twice as likely and ~12% heavier.", url: "https://www.worldweatherattribution.org/" },
+  { lat: 34.05, lng: -118.3, title: "Los Angeles wildfires", year: 2025, finding: "Fire-weather conditions made markedly more likely by warming.", url: "https://www.worldweatherattribution.org/" },
+];
+
+/* 2024 tropical/boreal primary-forest-loss hotspots (Global Forest Watch / WRI).
+   { lat, lng, name, note }. */
+const FOREST_HOTSPOTS = [
+  { lat: -16.3, lng: -63.6, name: "Bolivia", note: "1.5 Mha primary forest lost in 2024 (+200%), fire-driven" },
+  { lat: -6.0, lng: -55.0, name: "Brazilian Amazon", note: "Largest single-country loss; fire the leading driver in 2024" },
+  { lat: -1.0, lng: 114.0, name: "Indonesia", note: "Primary-forest loss rose again in 2024" },
+  { lat: -2.0, lng: 23.0, name: "DR Congo (Congo Basin)", note: "Loss stayed elevated across the Congo Basin" },
+  { lat: 58.0, lng: -110.0, name: "Canada (boreal)", note: "Record fire-driven tree-cover loss" },
+  { lat: -4.0, lng: -73.0, name: "Peru / Colombia", note: "Andes–Amazon frontier loss" },
+];
+
+/* Coarse zonal temperature anomaly (°C vs 1951–1980), by decade — the shape
+   of NASA GISS zonal means, Arctic amplification visible. Rendered as
+   full-width latitude bands the time-scrubber recolours. Values are
+   approximate decadal zonal means; see DATA-SOURCES.md. */
+const ANOMALY_ZONES = [
+  { s: 64, n: 90, d: { 1980: 0.9, 1990: 1.1, 2000: 1.7, 2010: 2.4, 2020: 3.0 } },
+  { s: 44, n: 64, d: { 1980: 0.4, 1990: 0.6, 2000: 1.0, 2010: 1.5, 2020: 1.9 } },
+  { s: 24, n: 44, d: { 1980: 0.3, 1990: 0.5, 2000: 0.9, 2010: 1.2, 2020: 1.6 } },
+  { s: 0, n: 24, d: { 1980: 0.2, 1990: 0.4, 2000: 0.6, 2010: 0.9, 2020: 1.2 } },
+  { s: -24, n: 0, d: { 1980: 0.2, 1990: 0.3, 2000: 0.5, 2010: 0.8, 2020: 1.1 } },
+  { s: -44, n: -24, d: { 1980: 0.1, 1990: 0.3, 2000: 0.5, 2010: 0.7, 2020: 0.9 } },
+  { s: -64, n: -44, d: { 1980: 0.1, 1990: 0.2, 2000: 0.4, 2010: 0.6, 2020: 0.8 } },
+  { s: -90, n: -64, d: { 1980: 0.0, 1990: 0.1, 2000: 0.2, 2010: 0.4, 2020: 0.6 } },
+];
+
+/* USGS live earthquakes feed (keyless, CORS-ok) — past 7 days, M2.5+. */
+const USGS_FEED = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojson";

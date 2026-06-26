@@ -14,7 +14,7 @@ A single static page (no framework, no build step required) that moves through:
 
 1. **Prologue · The Ticker** — fossil CO₂ released since you opened the page (1,208 t/s, GCP 2025).
 2. **Ch.01 · The Record** — the canonical climate indicators as sortable, sourced cards with sparklines + heat stripes.
-3. **Ch.02 · The Map** — latitudinal warming band; the live hazard map lives in *Your area*.
+3. **Ch.02 · The Map** — a full-bleed MapLibre world map: live hazards (USGS quakes + GDACS, 7 days), a decadal temperature-anomaly overlay, forest-loss hotspots and World Weather Attribution pins, with a 1980→today time scrubber and the latitude band beneath.
 4. **Ch.03 · The Ledger** — emissions by state, by corporation (Carbon Majors), and the 30-year policy/lobbying timeline.
 5. **Ch.04 · The Forecast** — a scenario explorer (IPCC / CAT / IEA), every number with its scenario and range.
 6. **Coda · Have your say** — rank priorities → your area (live hazards) → an auto-written, editable letter to your head of state → the coalition globe + shareable card.
@@ -65,14 +65,15 @@ Open-Meteo weather + air quality, GDACS).
 
 Push to a public repo under the `StudioEx-Creative` org and enable Pages from `main`
 root. Bump the `?v=2026rN` query string on the CSS/JS tags in `index.html` each deploy
-so Pages serves fresh assets. URL: `studioex-creative.github.io/Mututally-reassured-destruction/`.
+so Pages serves fresh assets. URL: `studioex-creative.github.io/mutually-assured-destruction/`.
 
 ## Known v1 scope (for the next pass)
 
 This is a complete, deployable first pass built to the Cost of War caliber. Deliberately
 deferred, with hooks already in place:
-- **Full MapLibre/D3 world hazard map** with time scrubber — v1 ships the live *Your area*
-  feed + a latitudinal anomaly band instead.
+- **Map layers needing an API key** — NASA FIRMS active fires and NOAA NHC cyclones; and
+  the heavier build-time layers (GFW raster tiles, full 1°-gridded anomaly). The map ships
+  with live USGS quakes + GDACS, a decadal zonal-anomaly overlay, forest hotspots and WWA pins.
 - **`scripts/fetch.mjs`** build-time data snapshot — v1 figures are hand-verified
   (June 2026) and documented; the heat-stripes per-year CSV is the one series flagged to
   swap for the authoritative Berkeley Earth file.
