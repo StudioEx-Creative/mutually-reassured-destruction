@@ -42,15 +42,33 @@ function initBg() {
   })();
 }
 
-/* ═══ LIVE TICKER — CO₂ since page open ═══
-   Computed from performance.now() and the GCP 2025 per-second rate. */
+/* ═══ LIVE TICKERS — since page open (P0-6) ═══
+   CO₂ (GCP 2025 rate), tropical forest lost (GFW 2024 rate), and a literal
+   countdown of the remaining 1.5 °C budget (50% chance, GCP 2025). */
 const pageOpened = performance.now();
-function tickCO2() {
+const budgetExhaust = new Date(BUDGET_EXHAUST_DATE).getTime();
+function budgetCountdown() {
+  let ms = budgetExhaust - Date.now();
+  if (ms <= 0) return "budget exhausted";
+  const day = 86400000;
+  let totalDays = Math.floor(ms / day);
+  const years = Math.floor(totalDays / 365); totalDays -= years * 365;
+  const months = Math.floor(totalDays / 30); const days = totalDays - months * 30;
+  const rem = ms % day;
+  const hh = String(Math.floor(rem / 3600000)).padStart(2, "0");
+  const mm = String(Math.floor((rem % 3600000) / 60000)).padStart(2, "0");
+  const ss = String(Math.floor((rem % 60000) / 1000)).padStart(2, "0");
+  return `${years}y ${months}m ${days}d ${hh}:${mm}:${ss}`;
+}
+function tickers() {
   const secs = (performance.now() - pageOpened) / 1000;
-  const tonnes = CO2_PER_SECOND * secs;
-  const el = byId("ticker");
-  if (el) el.textContent = Math.floor(tonnes).toLocaleString();
-  requestAnimationFrame(tickCO2);
+  const co2 = byId("ticker");
+  if (co2) co2.textContent = Math.floor(CO2_PER_SECOND * secs).toLocaleString();
+  const fo = byId("tickerForest");
+  if (fo) fo.textContent = (FOREST_PER_SECOND * secs).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const bn = byId("tickerBudget")?.querySelector(".ticker-budget-num");
+  if (bn) bn.textContent = budgetCountdown();
+  requestAnimationFrame(tickers);
 }
 
 /* ═══ SCROLL REVEAL ═══ */
@@ -375,7 +393,10 @@ window.moveRank = function (k, dir) {
 };
 
 /* ═══ NAV ═══ */
-window.goToStep = function (id) { byId(id)?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" }); };
+window.goToStep = function (id) {
+  byId(id)?.scrollIntoView({ behavior: reduceMotion ? "auto" : "smooth", block: "start" });
+  if (id === "coalitionStep") setTimeout(() => { try { buildGlobe(); } catch (e) {} }, 50);
+};
 
 /* ═══ COUNTRY ═══ */
 function buildCountrySelect() {
@@ -428,7 +449,7 @@ function generateLetter() {
 
 My name is ${name}. I am writing not as a partisan, and not from anger, but as someone who has sat with the numbers and can no longer stay quiet about what they mean.
 
-In 2025 the burning of fossil fuels released a record 38.1 billion tonnes of CO₂ — more than 1,200 tonnes every second. Atmospheric CO₂ passed 430 parts per million for the first time in human history. The three years to 2025 were, on average, more than 1.5 °C above the pre-industrial climate — a line the world agreed in Paris it would try never to cross. The remaining budget for a fair chance of holding 1.5 °C is now about four years at current emissions.
+In 2025 the burning of fossil fuels released a record 38.1 billion tonnes of CO₂ — more than 1,200 tonnes every second. Atmospheric CO₂ passed 430 parts per million for the first time in human history. The three years to 2025 were, on average, more than 1.5 °C above the pre-industrial climate — a line the world agreed in Paris it would try never to cross. The remaining budget for a 50% chance of holding 1.5 °C is now about four years at current emissions (Global Carbon Project 2025).
 
 ${perCapLine}
 
@@ -563,15 +584,29 @@ function globeData() {
   return pts;
 }
 function hasWebGL() { try { const c = document.createElement("canvas"); return !!(window.WebGLRenderingContext && (c.getContext("webgl") || c.getContext("experimental-webgl"))); } catch (e) { return false; } }
+
+/* P0-3: the 3D globe is progressive enhancement only. If WebGL is absent,
+   globe.gl fails to load, or it doesn't initialise within 6 s, we render a
+   guaranteed flat fallback (equirectangular dot-map on canvas). Either way
+   the "rendering the globe…" string is removed and something always draws. */
+let flatActive = false, globeTimeout = null;
 function buildGlobe() {
   const wrap = byId("globeWrap");
-  if (!wrap || globeInstance) return;
-  if (!hasWebGL()) { wrap.style.display = "none"; return; }
-  if (window.Globe) initGlobe();
-  else { const s = document.createElement("script"); s.src = "https://cdn.jsdelivr.net/npm/globe.gl"; s.onload = initGlobe; s.onerror = () => (wrap.style.display = "none"); document.head.appendChild(s); }
+  if (!wrap || globeInstance || flatActive) return;
+  if (!hasWebGL()) { buildFlatFallback(); return; }
+  if (window.Globe) { initGlobe(); return; }
+  globeTimeout = setTimeout(() => { if (!globeInstance) buildFlatFallback(); }, 6000);
+  const s = document.createElement("script");
+  s.src = "https://cdn.jsdelivr.net/npm/globe.gl";
+  s.onload = initGlobe;
+  s.onerror = () => buildFlatFallback();
+  document.head.appendChild(s);
 }
 function initGlobe() {
-  const wrap = byId("globeWrap"); if (!wrap || !window.Globe) { if (wrap) wrap.style.display = "none"; return; }
+  const wrap = byId("globeWrap");
+  if (!wrap || flatActive) return;
+  if (!window.Globe) { buildFlatFallback(); return; }
+  clearTimeout(globeTimeout);
   byId("globeLoading")?.remove();
   const mobile = innerWidth <= 760;
   try {
@@ -585,10 +620,45 @@ function initGlobe() {
       .pointLabel((d) => `${d.country}: ${d.count.toLocaleString()} voices`);
     const controls = globeInstance.controls();
     controls.autoRotate = !reduceMotion; controls.autoRotateSpeed = 0.5; controls.enableZoom = true;
-    addEventListener("resize", () => { globeInstance.width(wrap.clientWidth).height(wrap.clientHeight); }, { passive: true });
-  } catch (e) { wrap.style.display = "none"; }
+    addEventListener("resize", () => { if (globeInstance) globeInstance.width(wrap.clientWidth).height(wrap.clientHeight); }, { passive: true });
+  } catch (e) { buildFlatFallback(); }
 }
-function refreshGlobe() { if (globeInstance) globeInstance.pointsData(globeData()); }
+function buildFlatFallback() {
+  if (flatActive || globeInstance) return;
+  flatActive = true;
+  clearTimeout(globeTimeout);
+  const wrap = byId("globeWrap");
+  if (!wrap) return;
+  wrap.innerHTML = '<canvas id="flatGlobe" style="width:100%;height:100%;display:block"></canvas><div class="globe-sub" style="position:absolute;left:12px;bottom:8px;margin:0">each point is a country · brighter = more voices</div>';
+  wrap.style.position = "relative";
+  drawFlat();
+  addEventListener("resize", drawFlat, { passive: true });
+}
+function drawFlat() {
+  const cv = byId("flatGlobe"); if (!cv) return;
+  const wrap = byId("globeWrap");
+  const dpr = Math.min(2, window.devicePixelRatio || 1);
+  const W = wrap.clientWidth, H = wrap.clientHeight;
+  cv.width = W * dpr; cv.height = H * dpr;
+  const x = cv.getContext("2d"); x.setTransform(dpr, 0, 0, dpr, 0, 0);
+  x.clearRect(0, 0, W, H);
+  x.strokeStyle = "rgba(110,199,232,0.06)"; x.lineWidth = 1;
+  for (let lon = -180; lon <= 180; lon += 30) { const px = ((lon + 180) / 360) * W; x.beginPath(); x.moveTo(px, 0); x.lineTo(px, H); x.stroke(); }
+  for (let lat = -60; lat <= 60; lat += 30) { const py = ((90 - lat) / 180) * H; x.beginPath(); x.moveTo(0, py); x.lineTo(W, py); x.stroke(); }
+  const counts = getCountrySignups(), max = Math.max(1, ...Object.values(counts));
+  Object.entries(counts).forEach(([country, n]) => {
+    const c = COUNTRY_COORDS[country]; if (!c || n <= 0) return;
+    const t = n / max, col = volColor(t);
+    const px = ((c[1] + 180) / 360) * W, py = ((90 - c[0]) / 180) * H, r = 2 + Math.sqrt(t) * 9;
+    x.globalAlpha = 0.22; x.beginPath(); x.arc(px, py, r * 2.2, 0, 7); x.fillStyle = col; x.fill();
+    x.globalAlpha = 0.9; x.beginPath(); x.arc(px, py, r, 0, 7); x.fillStyle = col; x.fill();
+    x.globalAlpha = 1;
+  });
+}
+function refreshGlobe() {
+  if (globeInstance) globeInstance.pointsData(globeData());
+  else if (flatActive) drawFlat();
+}
 
 /* ═══ SHARE CARD (canvas PNG export) ═══ */
 window.generateShareCard = function () {
@@ -601,7 +671,7 @@ window.generateShareCard = function () {
   byId("scOverlay").classList.add("open");
 };
 window.shareCardTo = function (where) {
-  const url = "https://studioex-creative.github.io/Mututally-reassured-destruction/";
+  const url = "https://studioex-creative.github.io/mutually-assured-destruction/";
   const txt = "The planetary bill of carbon, and the ledger of choices that produced it. Mutually Assured Destruction — Blueprint × StudioEX.";
   if (where === "twitter") window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(txt)}&url=${encodeURIComponent(url)}`, "_blank");
   else navigator.clipboard.writeText(url).then(() => alert("Link copied."));
@@ -628,7 +698,7 @@ window.downloadCard = function () {
   x.fillStyle = "#ff6b35"; x.font = "600 56px 'Source Serif 4', Georgia, serif"; x.fillText("38.1 Gt", P, 1130);
   x.fillStyle = "#8593a0"; x.font = "22px 'IBM Plex Mono', monospace"; x.fillText("fossil CO₂ a year, and rising", P, 1165);
   x.fillStyle = "#6ec7e8"; x.font = "600 56px 'Source Serif 4', Georgia, serif"; x.textAlign = "right"; x.fillText("~4 years", W - P, 1130);
-  x.fillStyle = "#8593a0"; x.font = "22px 'IBM Plex Mono', monospace"; x.fillText("of 1.5 °C budget left", W - P, 1165); x.textAlign = "left";
+  x.fillStyle = "#8593a0"; x.font = "20px 'IBM Plex Mono', monospace"; x.fillText("left for a 50% chance of 1.5 °C", W - P, 1165); x.textAlign = "left";
   x.fillStyle = "#8593a0"; x.font = "22px 'IBM Plex Mono', monospace";
   x.fillText(selectedCountry ? selectedCountry[0] : "studioex.co", P, 1270);
   x.textAlign = "right"; x.fillText("@404blueprint", W - P, 1270); x.textAlign = "left";
@@ -643,18 +713,32 @@ function wrapText(ctx, text, x, y, maxW, lh) {
   ctx.fillText(line.trim(), x, y);
 }
 
-/* ═══ COALITION GLOBE lazy trigger ═══ */
+/* ═══ COALITION GLOBE lazy trigger ═══
+   Bulletproof: an IntersectionObserver AND a scroll backstop AND an
+   immediate proximity check, all converging on one idempotent buildGlobe(). */
 function initGlobeLazy() {
   const wrap = byId("globeWrap"); if (!wrap) return;
-  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { buildGlobe(); io.disconnect(); } }), { rootMargin: "200px" });
+  let fired = false;
+  const io = new IntersectionObserver((es) => { if (es.some((e) => e.isIntersecting)) fire(); }, { rootMargin: "600px 0px" });
+  const onScroll = () => {
+    const r = wrap.getBoundingClientRect();
+    if (r.top < window.innerHeight + 600 && r.bottom > -600) fire();
+  };
+  function fire() {
+    if (fired) return; fired = true;
+    io.disconnect(); window.removeEventListener("scroll", onScroll);
+    buildGlobe();
+  }
   io.observe(wrap);
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll(); // in case it is already near the viewport on load
 }
 window.onMadHydrated = function () { renderCoalitionCount(); buildGlobalPriorities(); refreshGlobe(); };
 
 /* ═══ INIT ═══ */
 function init() {
   initBg();
-  tickCO2();
+  tickers();
   initReveal();
   buildCards(); initSort();
   buildStripes();

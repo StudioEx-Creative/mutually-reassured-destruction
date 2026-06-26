@@ -87,6 +87,22 @@ All free, keyless, CORS-friendly, called client-side (`js/hazard.js`):
 
 **Need a free key (wire before public launch):** [NASA FIRMS](https://firms.modaps.eosdis.nasa.gov/api/) active fires (MAP_KEY) and [OpenAQ v3](https://docs.openaq.org/) air monitors. Route these through a tiny proxy/Worker so the key isn't exposed, or accept the keyed client call. See README.
 
+## Finishing sprint — P0 additions (retrieved June 2026)
+
+**Ticker (P0-6).** CO₂ 38.1 Gt/yr verified against [Global Carbon Project 2025](https://globalcarbonbudget.org/) (Nov 2025 release) — unchanged. New: tropical primary-forest loss **12.75 ha/min** = GFW/WRI 2024 6.7 Mha ÷ 525,600 min. New: **1.5 °C budget countdown** — GCP 2025 puts the remaining budget for a **50% chance** of 1.5 °C at ~4 years at 2025 rates; the live countdown anchors exhaustion at 2029-01-01 (start of 2025 + 4 yr) and always carries the 50% caveat.
+
+**Share card / budget caveat (P0-5).** Every appearance of the "~4 years" figure now reads "for a 50% chance of 1.5 °C" and cites the [GCP remaining-budget table](https://globalcarbonbudget.org/) (card, methodology footer, letter).
+
+**Forecast 2040 (P0-4).** 2040 is not a published reporting year for CAT/IEA/IPCC SSP; each 2040 value is **linearly interpolated** from the bracketing 2030 and 2050 figures and labelled "Interpolated from … 2030 and 2050 values" in the card and methodology footer.
+
+**Chapter 02 map (P0-2).**
+- Basemap: [CARTO dark](https://carto.com/attributions) raster tiles, © OpenStreetMap (keyless). Library: [MapLibre GL JS](https://maplibre.org/) 4.7.1 (CDN, lazy-loaded).
+- Live hazards (last 7 days, cached 1 hr client-side): [USGS M2.5+ week feed](https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojson) (GeoJSON, keyless) + [GDACS event list](https://www.gdacs.org/) (best-effort, graceful fallback).
+- Temperature-anomaly overlay & latitude band: approximate **decadal zonal means** (°C vs 1951–1980) following [NASA GISS](https://data.giss.nasa.gov/gistemp/) — the scrubber selects the decade. Values are coarse zonal approximations; swap for the gridded GISS/Berkeley CSV via the build pipeline before a press push.
+- Forest-loss hotspots: named 2024 hotspots (Bolivia, Brazilian Amazon, Indonesia, DR Congo, Canada boreal, Peru/Colombia) from [Global Forest Watch / WRI 2024](https://www.wri.org/news/release-global-forest-loss-shatters-records-2024-fueled-massive-fires).
+- Attribution pins: curated [World Weather Attribution](https://www.worldweatherattribution.org/) rapid studies 2022–2025; pin findings summarise each study's communicated conclusion and link to WWA. **REFRESH** as new studies publish; verify each finding against its study page before a press push.
+- Deferred (need a key — see README/BACKEND): NASA FIRMS active fires, NOAA NHC cyclones, GFW raster tile layer, full 1°-gridded anomaly.
+
 ## Refresh calendar
 - **Monthly:** Mauna Loa CO₂ (NOAA).
 - **Each Jan:** prior-year global temperature (Copernicus/WMO/Berkeley); GCP annual budget (released Nov/Dec).
