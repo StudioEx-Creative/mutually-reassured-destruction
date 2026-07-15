@@ -72,6 +72,8 @@ function tickers() {
   if (fo) fo.textContent = (FOREST_PER_SECOND * secs).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   const bn = byId("tickerBudget")?.querySelector(".ticker-budget-num");
   if (bn) bn.textContent = budgetCountdown();
+  const ig = byId("iceGreenland"); if (ig) ig.textContent = Math.floor(GREENLAND_PER_SEC * secs).toLocaleString();
+  const ia = byId("iceAntarctica"); if (ia) ia.textContent = Math.floor(ANTARCTICA_PER_SEC * secs).toLocaleString();
   requestAnimationFrame(tickers);
 }
 
@@ -175,6 +177,7 @@ function drawDetailChart(d) {
 }
 
 /* ═══ HEAT STRIPES ═══ */
+let stripesCVD = false; // colour-blind-safe palette toggle (P2-4)
 function buildStripes() {
   const wrap = byId("stripes");
   if (!wrap) return;
@@ -185,14 +188,78 @@ function buildStripes() {
     return `<span class="stripe" style="background:${stripeColor(t)}" title="${yr}: ${v >= 0 ? "+" : ""}${v.toFixed(2)} °C"></span>`;
   }).join("");
 }
-function stripeColor(t) {
-  // ice-blue (cool) → off-white → ember (hot)
-  const stops = [[0, [42, 111, 140]], [0.35, [110, 199, 232]], [0.5, [205, 214, 220]], [0.72, [178, 58, 20]], [1, [255, 107, 53]]];
+function rampColor(stops, t) {
   let a = stops[0], b = stops[stops.length - 1];
   for (let i = 0; i < stops.length - 1; i++) if (t >= stops[i][0] && t <= stops[i + 1][0]) { a = stops[i]; b = stops[i + 1]; break; }
   const f = (t - a[0]) / (b[0] - a[0] || 1);
   const c = a[1].map((v, i) => Math.round(v + (b[1][i] - v) * f));
   return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+function stripeColor(t) {
+  const brand = [[0, [42, 111, 140]], [0.35, [110, 199, 232]], [0.5, [205, 214, 220]], [0.72, [178, 58, 20]], [1, [255, 107, 53]]];
+  return rampColor(stripesCVD ? STRIPES_CVD : brand, t);
+}
+window.toggleStripePalette = function () {
+  stripesCVD = !stripesCVD;
+  const b = byId("cvdToggle");
+  if (b) { b.setAttribute("aria-pressed", String(stripesCVD)); b.classList.toggle("on", stripesCVD); b.textContent = stripesCVD ? "Brand palette" : "High-contrast palette"; }
+  buildStripes();
+};
+
+/* ═══ P2-1 · FOREST-COVER RIBBON ═══ */
+function buildForestRibbon() {
+  const wrap = byId("forestRibbon");
+  if (!wrap) return;
+  const max = Math.max(...FOREST_RIBBON.map((d) => d[1]));
+  const min = Math.min(...FOREST_RIBBON.map((d) => d[1]));
+  wrap.innerHTML = FOREST_RIBBON.map(([yr, mha]) => {
+    const t = (mha - min) / (max - min || 1); // 0..1 loss intensity
+    // faint slate → ember, darkness ∝ loss
+    const col = rampColor([[0, [26, 42, 34]], [0.5, [122, 74, 40]], [1, [255, 107, 53]]], t);
+    return `<span class="fr-cell" style="background:${col}" title="${yr}: ${mha} Mha lost"></span>`;
+  }).join("");
+}
+
+/* ═══ P2-2 · WHAT WORKS ═══ */
+function buildProgress() {
+  const el = byId("progressBlock");
+  if (!el) return;
+  const r = PROGRESS.renewables, o = PROGRESS.ozone;
+  el.innerHTML = `
+    <div class="pg-eyebrow">Not prophecy, and not only loss — what works</div>
+    <div class="pg-grid">
+      <div class="pg-card">
+        <div class="pg-stat ice">${r.stat}</div>
+        <div class="pg-body">${r.body}</div>
+        <div class="pg-caveat">${r.caveat}</div>
+        <div class="pg-src"><a href="${r.url}" target="_blank" rel="noopener">${r.src} ↗</a></div>
+      </div>
+      <div class="pg-card">
+        <div class="pg-stat ice">${o.stat}</div>
+        <div class="pg-body">${o.body}</div>
+        <div class="pg-lesson">${o.lesson}</div>
+        <div class="pg-src"><a href="${o.url}" target="_blank" rel="noopener">${o.src} ↗</a></div>
+      </div>
+    </div>`;
+}
+
+/* ═══ P2-3 · STICKY CHAPTER-NAV PILL ═══ */
+function initNavpill() {
+  const pill = byId("navpill");
+  if (!pill) return;
+  let dismissed = false, lastY = window.scrollY;
+  pill.querySelector(".np-close")?.addEventListener("click", () => { dismissed = true; });
+  const onScroll = () => {
+    if (dismissed) return;
+    const y = window.scrollY, past = y > window.innerHeight * 0.9;
+    if (!past) { pill.setAttribute("hidden", ""); lastY = y; return; }
+    // hide on scroll-down, reveal on scroll-up
+    if (y > lastY + 6) pill.setAttribute("hidden", "");
+    else if (y < lastY - 6) pill.removeAttribute("hidden");
+    lastY = y;
+  };
+  window.addEventListener("scroll", onScroll, { passive: true });
+  onScroll();
 }
 
 /* ═══ CHAPTER 02 · LATITUDINAL ANOMALY BAND ═══
@@ -925,10 +992,12 @@ function init() {
   initReveal();
   buildCards(); initSort();
   buildStripes();
+  buildForestRibbon();
   buildAnomaly();
   buildStates(); initStatesTabs();
   buildMajors(); buildTimeline();
   buildScenarioBtns(); renderForecast();
+  buildProgress(); initNavpill();
   buildPriorities(); renderPriorities();
   buildCountrySelect();
   renderCoalitionCount(); buildGlobalPriorities(); initGlobeLazy();

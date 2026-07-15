@@ -19,11 +19,22 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..600&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="css/style.css?v=2026r11" />
+    <link rel="stylesheet" href="css/style.css?v=2026r12" />
   </head>
   <body>
     <a class="skip-link" href="#record">Skip to the content</a>
     <canvas id="bg" aria-hidden="true"></canvas>
+
+    <!-- P2-3 · sticky chapter-nav pill -->
+    <nav class="navpill" id="navpill" aria-label="Chapters (floating)" hidden>
+      <a href="#record" title="The Record">01</a>
+      <a href="#map" title="The Map">02</a>
+      <a href="#ledger" title="The Ledger">03</a>
+      <a href="#forecast" title="The Forecast">04</a>
+      <a href="#say" title="Have your say" class="np-say">Say</a>
+      <a href="#top" class="np-top" title="Back to top" onclick="window.scrollTo({top:0,behavior:'smooth'});return false;">↑</a>
+      <button class="np-close" onclick="document.getElementById('navpill').setAttribute('hidden','');" aria-label="Dismiss chapter nav">✕</button>
+    </nav>
 
     <!-- ═══ PROLOGUE · THE TICKER ═══ -->
     <header class="hero">
@@ -95,15 +106,39 @@
 
           <!-- heat stripes -->
           <div class="stripes-block rv">
-            <div class="stripes-h">The warming stripes · global temperature, 1850–2025</div>
-            <div class="stripes" id="stripes" role="img" aria-label="Heat stripes showing global temperature rising from blue (cool) in 1850 to deep red (hot) in 2025"></div>
+            <div class="stripes-head">
+              <div class="stripes-h">The warming stripes · global temperature, 1850–2025</div>
+              <button class="cvd-toggle" id="cvdToggle" aria-pressed="false" onclick="toggleStripePalette()">High-contrast palette</button>
+            </div>
+            <div class="stripes" id="stripes" role="img" aria-label="Warming stripes: global temperature by year, 1850 to 2025" aria-describedby="stripesDesc"></div>
             <div class="stripes-axis"><span>1850</span><span>1920</span><span>1970</span><span>2025</span></div>
+            <p class="visually-hidden" id="stripesDesc">Each vertical stripe is one year, coloured by its global mean temperature relative to the 1850–1900 average — deep blue for the coolest years around 1900, through pale tones mid-century, to deep red for the record heat of the 2020s. The overall movement is a steady shift from blue to red, accelerating after 1970.</p>
             <p class="stripes-cap">
               Each stripe is one year, coloured by its temperature against the
               1850–1900 average. The visual concept is Ed Hawkins'
               <a href="https://showyourstripes.info/" target="_blank" rel="noopener">#ShowYourStripes</a>;
               data follows the Berkeley Earth annual record.
             </p>
+          </div>
+
+          <!-- ice-mass-balance dual counter (P2-1) -->
+          <div class="ice-counter rv" role="img" aria-label="Live counter of ice lost from Greenland and Antarctica since this page opened" aria-describedby="iceDesc">
+            <div class="ice-counter-h">Ice lost since you opened this page</div>
+            <div class="ice-counter-grid">
+              <div class="ice-col"><div class="ice-num" id="iceGreenland">0</div><div class="ice-lbl">tonnes · Greenland</div></div>
+              <div class="ice-col"><div class="ice-num" id="iceAntarctica">0</div><div class="ice-lbl">tonnes · Antarctica</div></div>
+            </div>
+            <div class="ice-cap">Greenland loses ~270 and Antarctica ~140 billion tonnes a year. <a href="https://climate.nasa.gov/vital-signs/ice-sheets/" target="_blank" rel="noopener">NASA GRACE-FO ↗</a></div>
+            <p class="visually-hidden" id="iceDesc">Two counters rising in real time, showing tonnes of ice mass lost from the Greenland and Antarctic ice sheets since the page opened, from NASA satellite annual-loss rates.</p>
+          </div>
+
+          <!-- forest-cover ribbon (P2-1) -->
+          <div class="forest-ribbon-block rv">
+            <div class="stripes-h">The forest ribbon · tropical primary-forest loss, 2002–2024</div>
+            <div class="forest-ribbon" id="forestRibbon" role="img" aria-label="Ribbon of yearly tropical primary-forest loss, 2002 to 2024, darkest in 2024" aria-describedby="ribbonDesc"></div>
+            <div class="stripes-axis"><span>2002</span><span>2013</span><span>2024</span></div>
+            <p class="visually-hidden" id="ribbonDesc">One cell per year from 2002 to 2024; the more ember the cell, the more tropical primary forest was lost that year. The fire years of 2016 and 2017 stand out, and 2024 is the most intense at 6.7 million hectares.</p>
+            <p class="stripes-cap">One cell per year; more ember means more lost. 2024 is the worst on record — 6.7 Mha. <a href="https://www.wri.org/news/release-global-forest-loss-shatters-records-2024-fueled-massive-fires" target="_blank" rel="noopener">Global Forest Watch ↗</a></p>
           </div>
         </div>
       </section>
@@ -250,6 +285,9 @@
             <a href="https://www.iea.org/reports/world-energy-outlook-2025" target="_blank" rel="noopener">IEA WEO 2025 ↗</a>.
             SSP5-8.5 is shown only as an upper-bound stress test; the IPCC notes it is no longer the most likely trajectory.
           </p>
+
+          <!-- P2-2 · what works (honest progress) -->
+          <div class="progress-block rv rv-d2" id="progressBlock"></div>
         </div>
       </section>
     </main>
@@ -514,11 +552,11 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/config.js?v=2026r11"></script>
-    <script src="js/data.js?v=2026r11"></script>
-    <script src="js/backend.js?v=2026r11"></script>
-    <script src="js/hazard.js?v=2026r11"></script>
-    <script src="js/map.js?v=2026r11"></script>
-    <script src="js/main.js?v=2026r11"></script>
+    <script src="js/config.js?v=2026r12" defer></script>
+    <script src="js/data.js?v=2026r12" defer></script>
+    <script src="js/backend.js?v=2026r12" defer></script>
+    <script src="js/hazard.js?v=2026r12" defer></script>
+    <script src="js/map.js?v=2026r12" defer></script>
+    <script src="js/main.js?v=2026r12" defer></script>
   </body>
 </html>
