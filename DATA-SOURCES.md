@@ -115,6 +115,15 @@ All free, keyless, CORS-friendly, called client-side (`js/hazard.js`):
 
 **Letter (P1-7).** Per-country **office titles** (President / Prime Minister / Chancellor / King) drive the salutation — the stable institution, so no head-of-state name can go stale. NDC-vs-1.5 °C alignment from [Climate Action Tracker](https://climateactiontracker.org/countries/). Head-of-state **names** are intentionally not hard-coded; the reader supplies one, or the office title is used. A fixtures page (`tests/letters.html`) renders all salutations for review. **Build-day tasks:** verify office titles, and expand `COUNTRIES` (currently 34: G20 + majors) toward the full G20 + EU27 + 20-most-populous set.
 
+## Finishing sprint — P2 additions (retrieved June 2026)
+
+- **Ice-mass counter (P2-1):** live dual counter from NASA GRACE-FO annual rates — Greenland ~270 Gt/yr, Antarctica ~140 Gt/yr.
+- **Forest ribbon (P2-1):** `FOREST_RIBBON` — tropical primary-forest loss by year 2002–2024 (Mha), Global Forest Watch / WRI annual series (approximate; verified anchors: 2016/2017 fire spikes, 2024 record 6.7 Mha). REFRESH each April.
+- **"What works" (P2-2):** renewables — 585 GW added in 2024, a record and 92.5% of new capacity ([IRENA Renewable Capacity Statistics 2025](https://www.irena.org/News/pressreleases/2025/Mar/Record-Breaking-Annual-Growth-in-Renewable-Power-Capacity)); ozone — ~99% of ozone-depleting substances phased out since the 1987 Montreal Protocol, recovery on track (~2040 most of world, ~2066 Antarctica), avoiding ~0.5 °C of warming ([UNEP / WMO / NASA](https://www.unep.org/news-and-stories/press-release/ozone-layer-recovery-track-helping-avoid-global-warming-05degc)).
+- **Colour-blind-safe stripes (P2-4):** `STRIPES_CVD` ramp after ColorBrewer RdBu (deuteranopia/protanopia-distinguishable), toggled at the warming stripes.
+- **P2-5 accessibility / P2-6 performance:** charts carry `role="img"` + `aria-describedby` long descriptions; non-critical JS is deferred; globe and map lazy-load. Run axe-core + Lighthouse-mobile on build day to confirm ≥90 across the board.
+- **P2-7 analytics:** none used — stated plainly in the privacy policy.
+
 ## Refresh calendar
 - **Monthly:** Mauna Loa CO₂ (NOAA).
 - **Each Jan:** prior-year global temperature (Copernicus/WMO/Berkeley); GCP annual budget (released Nov/Dec).

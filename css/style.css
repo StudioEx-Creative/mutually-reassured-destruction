@@ -602,3 +602,45 @@ footer a { color: var(--faint); }
 .fl-k { font-family: var(--fm); font-size: .56rem; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-top: .35rem; line-height: 1.4; }
 .fl-src { font-family: var(--fm); font-size: .58rem; color: var(--faint); margin-top: 1rem; line-height: 1.5; }
 .fl-src a { color: var(--ice); }
+
+/* ═══ P2-3 · sticky chapter-nav pill ═══ */
+.navpill { position: fixed; top: 1rem; right: 1rem; z-index: 800; display: flex; gap: .1rem; align-items: center; background: rgba(11,14,18,.85); backdrop-filter: blur(8px); border: 1px solid var(--border-2); border-radius: 99px; padding: .3rem .4rem; font-family: var(--fm); box-shadow: 0 6px 24px rgba(0,0,0,.45); transition: opacity .3s var(--ease), transform .3s var(--ease); }
+.navpill[hidden] { display: flex; opacity: 0; transform: translateY(-8px); pointer-events: none; }
+.navpill a { font-size: .68rem; color: var(--muted); padding: .35rem .55rem; border-radius: 99px; }
+.navpill a:hover { color: var(--text); background: rgba(255,255,255,.05); text-decoration: none; }
+.navpill .np-say { color: var(--ice); }
+.navpill .np-top { color: var(--faint); }
+.np-close { background: none; border: none; color: var(--faint); cursor: pointer; font-size: .68rem; padding: .3rem .45rem; }
+.np-close:hover { color: var(--text); }
+@media (max-width: 640px) {
+  .navpill { top: auto; bottom: 1rem; right: 50%; transform: translateX(50%); }
+  .navpill[hidden] { transform: translateX(50%) translateY(8px); }
+}
+
+/* ═══ P2-4 · CVD stripes toggle ═══ */
+.stripes-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: .8rem; }
+.stripes-head .stripes-h { margin-bottom: 0; }
+.cvd-toggle { font-family: var(--fm); font-size: .6rem; letter-spacing: .04em; color: var(--muted); background: none; border: 1px solid var(--border-2); border-radius: 99px; padding: .35rem .7rem; cursor: pointer; }
+.cvd-toggle:hover { color: var(--text); border-color: var(--faint); }
+.cvd-toggle.on { color: var(--near-black); background: var(--text); border-color: var(--text); }
+
+/* ═══ P2-1 · ice counter + forest ribbon ═══ */
+.ice-counter { margin-top: 2.5rem; border: 1px solid var(--border-2); border-radius: 8px; padding: 1.6rem; background: rgba(110,199,232,.03); }
+.ice-counter-h { font-family: var(--fm); font-size: .62rem; letter-spacing: .14em; text-transform: uppercase; color: var(--muted); margin-bottom: 1rem; }
+.ice-counter-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.ice-num { font-family: var(--fd); font-weight: 600; font-size: clamp(1.8rem,6vw,3rem); color: var(--ice); line-height: 1; font-variant-numeric: tabular-nums; text-shadow: 0 0 40px var(--ice-glow); }
+.ice-lbl { font-family: var(--fm); font-size: .58rem; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-top: .4rem; }
+.ice-cap { font-size: .78rem; color: var(--muted); margin-top: 1.2rem; } .ice-cap a { color: var(--ice); }
+.forest-ribbon-block { margin-top: 2.5rem; }
+.forest-ribbon { display: flex; width: 100%; height: 60px; border-radius: 4px; overflow: hidden; }
+.fr-cell { flex: 1 1 0; }
+
+/* ═══ P2-2 · what works ═══ */
+.progress-block { margin-top: 2.5rem; border: 1px solid var(--border-2); border-radius: 8px; padding: 1.8rem; background: rgba(110,199,232,.03); }
+.pg-eyebrow { font-family: var(--fm); font-size: .62rem; letter-spacing: .16em; text-transform: uppercase; color: var(--ice); margin-bottom: 1.2rem; }
+.pg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+.pg-stat { font-family: var(--fd); font-weight: 600; font-size: clamp(2.2rem,6vw,3.2rem); line-height: 1; color: var(--ice); }
+.pg-body { font-size: .92rem; color: var(--text); line-height: 1.6; margin-top: .6rem; }
+.pg-caveat, .pg-lesson { font-size: .84rem; color: var(--muted); line-height: 1.55; margin-top: .7rem; font-style: italic; }
+.pg-src { font-family: var(--fm); font-size: .58rem; margin-top: .8rem; } .pg-src a { color: var(--faint); }
+@media (max-width: 640px) { .pg-grid { grid-template-columns: 1fr; gap: 1.6rem; } .ice-counter-grid { gap: 1rem; } }

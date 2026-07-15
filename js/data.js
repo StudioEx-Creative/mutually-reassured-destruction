@@ -542,3 +542,46 @@ const ANOMALY_ZONES = [
 
 /* USGS live earthquakes feed (keyless, CORS-ok) — past 7 days, M2.5+. */
 const USGS_FEED = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/2.5_week.geojson";
+
+/* ═══ P2 · POLISH DATA ══════════════════════════════════════════════ */
+
+/* Per-ice-sheet loss rates for the dual live counter (P2-1). NASA GRACE-FO. */
+const GREENLAND_GT_YR = 270, ANTARCTICA_GT_YR = 140;
+const GREENLAND_PER_SEC = (GREENLAND_GT_YR * 1e9) / SECONDS_PER_YEAR;   // tonnes/s
+const ANTARCTICA_PER_SEC = (ANTARCTICA_GT_YR * 1e9) / SECONDS_PER_YEAR; // tonnes/s
+
+/* Forest-cover ribbon (P2-1): tropical primary-forest loss by year, Mha.
+   Global Forest Watch / WRI annual series (approximate; verified anchors incl.
+   2016/2017 fire spikes and the 2024 record 6.7 Mha). REFRESH each April. */
+const FOREST_RIBBON = [
+  [2002,3.0],[2003,3.2],[2004,3.9],[2005,4.0],[2006,3.4],[2007,3.7],[2008,3.4],
+  [2009,3.2],[2010,3.9],[2011,3.5],[2012,3.9],[2013,3.9],[2014,4.9],[2015,4.4],
+  [2016,5.9],[2017,5.9],[2018,4.6],[2019,4.2],[2020,4.7],[2021,4.2],[2022,4.1],
+  [2023,3.7],[2024,6.7],
+];
+
+/* "What works" (P2-2): honest progress, no triumphalism. Renewables (IRENA
+   2024) + the ozone-recovery precedent (Montreal Protocol / UNEP / NASA). */
+const PROGRESS = {
+  renewables: {
+    stat: "585 GW",
+    body: "of new renewable power was added in 2024 — a record, and 92.5% of all new capacity. Solar and wind were 96.6% of it. Renewables are now the cheapest new electricity almost everywhere.",
+    caveat: "Still short of the pace needed to triple capacity by 2030 (16.6%/yr). Adequate, not yet sufficient.",
+    src: "IRENA Renewable Capacity Statistics 2025",
+    url: "https://www.irena.org/News/pressreleases/2025/Mar/Record-Breaking-Annual-Growth-in-Renewable-Power-Capacity",
+  },
+  ozone: {
+    stat: "~99%",
+    body: "of ozone-depleting chemicals have been phased out since the 1987 Montreal Protocol. The ozone layer is on track to recover — around 2040 for most of the world, ~2066 over Antarctica — and the treaty will avoid an estimated 0.5 °C of warming.",
+    lesson: "What it took to heal the ozone layer is now known: naming the cause, agreeing to act, and holding to it. The climate task is larger, not impossible.",
+    src: "UNEP / WMO / NASA · Ozone Assessment",
+    url: "https://www.unep.org/news-and-stories/press-release/ozone-layer-recovery-track-helping-avoid-global-warming-05degc",
+  },
+};
+
+/* Colour-blind-safe warming-stripes palette (P2-4). Blue→grey→orange ramp,
+   deuteranopia/protanopia-distinguishable (after ColorBrewer RdBu, reversed). */
+const STRIPES_CVD = [
+  [0, [5, 48, 97]], [0.35, [67, 147, 195]], [0.5, [230, 230, 230]],
+  [0.72, [214, 96, 77]], [1, [178, 24, 43]],
+];
