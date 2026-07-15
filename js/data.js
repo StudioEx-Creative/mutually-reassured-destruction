@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════
-   MUTUALLY ASSURED DESTRUCTION — Blueprint × StudioEX, 2026
+   MUTUALLY REASSURED DESTRUCTION — Blueprint × StudioEX, 2026
    DATA LAYER
    ───────────────────────────────────────────────────────────────────
    Every figure below is sourced. Each carries a `src` id that resolves

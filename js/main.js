@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════
-   MUTUALLY ASSURED DESTRUCTION — MAIN
+   MUTUALLY REASSURED DESTRUCTION — MAIN
    Blueprint × StudioEX, 2026. Vanilla JS, no framework.
    ═══════════════════════════════════════════════════════════════════ */
 "use strict";
@@ -488,7 +488,7 @@ window.emailLetter = function () {
 window.tweetLetter = function () {
   if (!ranking.length) { alert("Choose and rank some priorities first."); return; }
   const top = ranking.slice(0, 3).map((i) => PRIORITIES[i].name).join(", ");
-  const txt = `My government's climate priorities, in order: ${top}. 38.1 Gt of fossil CO₂ a year; ~4 years of 1.5°C budget left. studioex.co #MutuallyAssuredDestruction @404blueprint`;
+  const txt = `My government's climate priorities, in order: ${top}. 38.1 Gt of fossil CO₂ a year; ~4 years of 1.5°C budget left. studioex.co #MutuallyReassuredDestruction @404blueprint`;
   window.open("https://twitter.com/intent/tweet?text=" + encodeURIComponent(txt), "_blank");
 };
 window.sendToRepresentative = function () {
@@ -671,8 +671,8 @@ window.generateShareCard = function () {
   byId("scOverlay").classList.add("open");
 };
 window.shareCardTo = function (where) {
-  const url = "https://studioex-creative.github.io/mutually-assured-destruction/";
-  const txt = "The planetary bill of carbon, and the ledger of choices that produced it. Mutually Assured Destruction — Blueprint × StudioEX.";
+  const url = "https://studioex-creative.github.io/mutually-reassured-destruction/";
+  const txt = "The planetary bill of carbon, and the ledger of choices that produced it. Mutually Reassured Destruction — Blueprint × StudioEX.";
   if (where === "twitter") window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(txt)}&url=${encodeURIComponent(url)}`, "_blank");
   else navigator.clipboard.writeText(url).then(() => alert("Link copied."));
 };
@@ -683,7 +683,7 @@ window.downloadCard = function () {
   x.fillStyle = g; x.fillRect(0, 0, W, H);
   const P = 90;
   x.fillStyle = "#ff6b35"; x.font = "500 26px 'IBM Plex Mono', monospace";
-  x.fillText("MUTUALLY ASSURED DESTRUCTION · 2026", P, 110);
+  x.fillText("MUTUALLY REASSURED DESTRUCTION · 2026", P, 110);
   x.fillStyle = "#8593a0"; x.font = "24px 'IBM Plex Mono', monospace";
   x.fillText("Blueprint × StudioEX", P, 150);
   x.fillStyle = "#fff"; x.font = "600 66px 'Source Serif 4', Georgia, serif";
@@ -702,7 +702,7 @@ window.downloadCard = function () {
   x.fillStyle = "#8593a0"; x.font = "22px 'IBM Plex Mono', monospace";
   x.fillText(selectedCountry ? selectedCountry[0] : "studioex.co", P, 1270);
   x.textAlign = "right"; x.fillText("@404blueprint", W - P, 1270); x.textAlign = "left";
-  const a = document.createElement("a"); a.download = "mutually-assured-destruction.png"; a.href = cv.toDataURL("image/png"); a.click();
+  const a = document.createElement("a"); a.download = "mutually-reassured-destruction.png"; a.href = cv.toDataURL("image/png"); a.click();
 };
 function wrapText(ctx, text, x, y, maxW, lh) {
   const words = text.split(" "); let line = "";

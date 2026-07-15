@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════
-   MUTUALLY ASSURED DESTRUCTION — RUNTIME CONFIG
+   MUTUALLY REASSURED DESTRUCTION — RUNTIME CONFIG
    ───────────────────────────────────────────────────────────────────
    To make the coalition counter and priority tallies LIVE (shared across
    all visitors), create a free Supabase project and paste its URL + anon

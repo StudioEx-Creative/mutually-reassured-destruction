@@ -1,5 +1,5 @@
 -- ════════════════════════════════════════════════════════════════════
--- MUTUALLY ASSURED DESTRUCTION — Supabase schema
+-- MUTUALLY REASSURED DESTRUCTION — Supabase schema
 -- Coalition sign-ups + aggregate tallies for the globe and priority bars.
 -- Locked down with row-level security: the public anon key may INSERT a
 -- single validated row and may READ only the aggregate RPCs below — never

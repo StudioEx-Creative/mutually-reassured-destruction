@@ -1,4 +1,4 @@
-# Mutually Assured Destruction — Data Sources & Audit Trail
+# Mutually Reassured Destruction — Data Sources & Audit Trail
 
 *An artwork by Blueprint · Produced by StudioEX · 2026.*
 

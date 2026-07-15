@@ -1,4 +1,4 @@
-# Mutually Assured Destruction
+# Mutually Reassured Destruction
 
 An interactive data artwork about the planetary bill of carbon — and the ledger of
 choices that produced it. A climate companion to **[The Cost of War](https://studioex-creative.github.io/cost-of-war/)**.
@@ -65,7 +65,7 @@ Open-Meteo weather + air quality, GDACS).
 
 Push to a public repo under the `StudioEx-Creative` org and enable Pages from `main`
 root. Bump the `?v=2026rN` query string on the CSS/JS tags in `index.html` each deploy
-so Pages serves fresh assets. URL: `studioex-creative.github.io/mutually-assured-destruction/`.
+so Pages serves fresh assets. URL: `studioex-creative.github.io/mutually-reassured-destruction/`.
 
 ## Known v1 scope (for the next pass)
 
