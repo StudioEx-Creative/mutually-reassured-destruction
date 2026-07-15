@@ -103,6 +103,18 @@ All free, keyless, CORS-friendly, called client-side (`js/hazard.js`):
 - Attribution pins: curated [World Weather Attribution](https://www.worldweatherattribution.org/) rapid studies 2022–2025; pin findings summarise each study's communicated conclusion and link to WWA. **REFRESH** as new studies publish; verify each finding against its study page before a press push.
 - Deferred (need a key — see README/BACKEND): NASA FIRMS active fires, NOAA NHC cyclones, GFW raster tile layer, full 1°-gridded anomaly.
 
+## Finishing sprint — P1 additions (retrieved June 2026)
+
+**Carbon Majors (P1-1).** Per-entity cumulative shares (1854–2024) and 2024 shares from the [InfluenceMap Carbon Majors 2024 update](https://carbonmajors.org/) (Tables 1–2): e.g. Former Soviet Union 6.54%, China coal 5.10%, Saudi Aramco 3.66%, Chevron 3.08%, ExxonMobil 2.79%. Top 20 = 872 GtCO₂e (42.5%). Current CEOs **web-verified June 2026**: ExxonMobil — Darren Woods; Chevron — Mike Wirth; Shell — Wael Sawan; TotalEnergies — Patrick Pouyanné; ConocoPhillips — Ryan Lance; BP — Meg O'Neill (from Apr 2026). State-owned entities carry their named state owner. Approx. 2024 revenues (public reports, shown with ≈). **REFRESH** CEOs and the annual figures each year.
+
+**Journalism feed (P1-3).** 10 real, dated, linked items from Carbon Brief, IEA, Climate TRACE, Ember, Global Carbon Project, WMO, WRI/GFW, Climate Action Tracker, InfluenceMap and Copernicus. Lobbying-lane figures: COP badge counts from the [Kick Big Polluters Out](https://kickbigpollutersout.org/) coalition / Global Witness (COP26 503, COP28 2,456, COP29 1,773) and US federal lobbying from [OpenSecrets](https://www.opensecrets.org/industries/indus.php?ind=E01). Intended to be refreshed at build time via `scripts/fetch.mjs` (RSS→JSON).
+
+**Forecast comparison (P1-4).** Endpoint impacts (`FORECAST_IMPACTS`) are given **by pathway at 2100 / mid-century**, not per intermediate horizon, because intermediate-year values for coral / ice-free-Arctic / heat-exposure / displacement are not cleanly published — per the brief's rule we omit what we can't source across all combinations (e.g. a global forest-cover % projection is dropped). Temperature and sea level are shown per horizon in the cards. Sources: IPCC AR6 WG1; World Bank Groundswell.
+
+**Localised forecast (P1-5).** Local warming trajectory and hot-day counts from the [Open-Meteo Climate API](https://open-meteo.com/en/docs/climate-api) — downscaled CMIP6 (model MRI-AGCM3-2-S, high-emission), daily 2000–2049. One model shown; framed as direction, not decimal. Coordinates query only that API; opt-in; falls back to the country's CAT rating.
+
+**Letter (P1-7).** Per-country **office titles** (President / Prime Minister / Chancellor / King) drive the salutation — the stable institution, so no head-of-state name can go stale. NDC-vs-1.5 °C alignment from [Climate Action Tracker](https://climateactiontracker.org/countries/). Head-of-state **names** are intentionally not hard-coded; the reader supplies one, or the office title is used. A fixtures page (`tests/letters.html`) renders all salutations for review. **Build-day tasks:** verify office titles, and expand `COUNTRIES` (currently 34: G20 + majors) toward the full G20 + EU27 + 20-most-populous set.
+
 ## Refresh calendar
 - **Monthly:** Mauna Loa CO₂ (NOAA).
 - **Each Jan:** prior-year global temperature (Copernicus/WMO/Berkeley); GCP annual budget (released Nov/Dec).

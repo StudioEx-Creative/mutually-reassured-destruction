@@ -10,6 +10,10 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
 let ranking = [];            // ordered priority indices = the user's ranking
 let selectedCountry = null;  // [name, iso, rating, perCap, contactUrl]
 let indSort = "departure";
+let restoringState = false;  // guards saveState() while loadState() runs
+let hydrated = false;        // saveState() is inert until init + loadState finish
+let letterEdited = false;    // true once the user hand-edits the letter body
+const STATE_KEY = "mad-state-v1"; // localStorage key (P1-8), never sent anywhere
 
 /* ═══ FORMAT ═══ */
 const famColor = (f) => (f === "ice" ? getCss("--ice") : getCss("--ember"));
@@ -113,7 +117,7 @@ function buildCards() {
   grid.innerHTML = order.map((i) => {
     const d = INDICATORS[i];
     const col = d.family === "ice" ? "var(--ice)" : "var(--ember)";
-    return `<button class="indcard ${d.family === "ice" ? "ice" : "heat"}" data-i="${i}" aria-label="${d.name}, ${d.value} ${d.unit}. Tap for detail.">
+    return `<button class="indcard ${d.family === "ice" ? "ice" : "heat"}" data-i="${i}" data-source-id="${d.src}" aria-label="${d.name}, ${d.value} ${d.unit}. Tap for source and method.">
       <div class="indcard-top">
         <span class="indcard-name">${d.name}</span>
         <span class="indcard-fam fam-${d.family === "ice" ? "ice" : "heat"}"></span>
@@ -122,7 +126,7 @@ function buildCards() {
       <div class="indcard-val2">${d.value2}</div>
       ${sparkline(d.series, col)}
       <div class="indcard-cap">${d.caption}</div>
-      <div class="indcard-more">Source &amp; method →</div>
+      <div class="indcard-more">Source &amp; method · accessed ${SOURCES[d.src].d} →</div>
     </button>`;
   }).join("");
   grid.querySelectorAll(".indcard").forEach((b) =>
@@ -265,22 +269,67 @@ function animateBars(wrap) {
   }), { threshold: 0.15 });
   io.observe(wrap);
 }
+const OWN_LABEL = { investor: "Investor-owned", state: "State-owned", nation: "Nation-state" };
 function buildMajors() {
   byId("majorsBig").textContent = CARBON_MAJORS_STAT.headline;
-  byId("majorsBody").innerHTML = CARBON_MAJORS_STAT.body + ` <a href="https://carbonmajors.org/" target="_blank" rel="noopener" style="color:var(--ice)">Carbon Majors ↗</a>`;
+  byId("majorsBody").innerHTML = CARBON_MAJORS_STAT.body + ` <a href="https://carbonmajors.org/" target="_blank" rel="noopener" style="color:var(--ice)">Carbon Majors 2024 ↗</a>`;
   byId("subsidyBig").textContent = CARBON_MAJORS_STAT.subsidy;
   byId("subsidyBody").innerHTML = CARBON_MAJORS_STAT.subsidyBody + ` <a href="https://www.imf.org/en/Topics/climate-change/energy-subsidies" target="_blank" rel="noopener" style="color:var(--ice)">IMF ↗</a>`;
-  byId("majorsList").innerHTML = CARBON_MAJORS.map((m) =>
-    `<div class="major"><div class="major-name">${m.name}</div><div class="major-meta"><span class="tag ${m.type === "Investor" ? "inv" : ""}">${m.type}</span> · ${m.note}</div></div>`).join("");
+
+  const max = Math.max(...CARBON_MAJORS.map((m) => m.cum));
+  const bars = CARBON_MAJORS.map((m, i) =>
+    `<button class="maj-row" data-i="${i}" aria-label="${m.name}, ${m.cum}% of cumulative CO₂, ${OWN_LABEL[m.own]}">
+      <span class="maj-name">${m.name}</span>
+      <span class="maj-track"><span class="maj-fill ${m.own}" style="width:0" data-w="${((m.cum / max) * 100).toFixed(1)}"></span></span>
+      <span class="maj-val">${m.cum}%</span>
+    </button>`).join("");
+
+  byId("majorsList").innerHTML =
+    `<div class="majors-legend">
+      <span><i class="own-dot investor"></i>Investor-owned</span>
+      <span><i class="own-dot state"></i>State-owned company</span>
+      <span><i class="own-dot nation"></i>Nation-state production</span>
+      <span class="majors-hint">tap a producer ↓</span>
+    </div>
+    <div class="maj-axis">share of all fossil &amp; cement CO₂ since 1854</div>
+    <div class="majors-bars" id="majorsBars">${bars}</div>
+    <div class="majors-detail" id="majorsDetail" aria-live="polite">${majorDetailHTML(0)}</div>`;
+
+  const rows = byId("majorsBars");
+  rows.querySelectorAll(".maj-row").forEach((b) => {
+    const show = () => { byId("majorsDetail").innerHTML = majorDetailHTML(+b.dataset.i);
+      rows.querySelectorAll(".maj-row").forEach((r) => r.classList.toggle("on", r === b)); };
+    b.addEventListener("click", show);
+    b.addEventListener("mouseenter", show);
+    b.addEventListener("focus", show);
+  });
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { rows.querySelectorAll(".maj-fill").forEach((f) => f.style.width = f.dataset.w + "%"); io.disconnect(); } }), { threshold: 0.1 });
+  io.observe(rows);
+}
+function majorDetailHTML(i) {
+  const m = CARBON_MAJORS[i];
+  return `<div class="md-name">${m.name}</div>
+    <div class="md-tags"><span class="own-badge ${m.own}">${OWN_LABEL[m.own]}</span><span class="md-hq">${m.hq}</span></div>
+    <div class="md-stats">
+      <span><b>${m.cum}%</b> of all CO₂ since 1854</span>
+      ${m.y2024 ? `<span><b>${m.y2024}%</b> of 2024 emissions</span>` : ""}
+      ${m.rev ? `<span><b>${m.rev}</b> · 2024 revenue</span>` : ""}
+    </div>
+    <div class="md-leader">${m.leader}</div>
+    <div class="md-src">Source: <a href="https://carbonmajors.org/" target="_blank" rel="noopener">InfluenceMap · Carbon Majors 2024 ↗</a> · CEOs verified Jun 2026</div>`;
 }
 function buildTimeline() {
   byId("timeline").innerHTML = POLICY_TIMELINE.map((e) =>
-    `<div class="tl-item ${e.kind}"><div class="tl-year">${e.year}</div><div class="tl-title">${e.title}</div><div class="tl-body">${e.body}</div></div>`).join("");
-  byId("lobbyNote").innerHTML = LOBBY_NOTE + ` Sources: <a href="https://influencemap.org/" target="_blank" rel="noopener">InfluenceMap ↗</a>, <a href="https://www.opensecrets.org/" target="_blank" rel="noopener">OpenSecrets ↗</a>.`;
-  byId("newsFeed").innerHTML = NEWS_FEED.map((n) => {
-    const s = SOURCES[n.src];
-    return `<div class="news-item"><span class="news-outlet">${n.outlet}</span><a class="news-head" href="${s.url}" target="_blank" rel="noopener" style="color:var(--text)">${n.head}</a><span class="news-date">${n.date}</span></div>`;
-  }).join("");
+    `<div class="tl-item ${e.kind}">
+       <div class="tl-year">${e.year}</div>
+       <div class="tl-title">${e.title}</div>
+       <div class="tl-body">${e.body}</div>
+       ${e.lobby ? `<div class="tl-lobby"><span class="tl-lobby-tag">Lobbying</span>${e.lobby}</div>` : ""}
+     </div>`).join("");
+  byId("lobbyNote").innerHTML = LOBBY_NOTE + ` <a href="https://www.opensecrets.org/industries/indus.php?ind=E01" target="_blank" rel="noopener">OpenSecrets ↗</a> · <a href="https://influencemap.org/" target="_blank" rel="noopener">InfluenceMap ↗</a> · <a href="https://kickbigpollutersout.org/" target="_blank" rel="noopener">Kick Big Polluters Out ↗</a>`;
+  byId("newsFeed").innerHTML = `<div class="news-head-lbl">A curated feed · high-credibility journalism &amp; primary data releases</div>` +
+    NEWS_FEED.map((n) =>
+      `<div class="news-item"><span class="news-outlet">${n.outlet}</span><a class="news-head" href="${n.url}" target="_blank" rel="noopener" style="color:var(--text)">${n.head}</a><span class="news-date">${n.date}</span></div>`).join("");
 }
 
 /* ═══ CHAPTER 04 · FORECAST EXPLORER ═══ */
@@ -333,28 +382,109 @@ function renderCard(id, s) {
   requestAnimationFrame(() => requestAnimationFrame(() => { water.style.height = fill + "%"; }));
 }
 function buildCompare() {
-  const head = `<div class="fcmp-row head"><div>Impact</div><div>1.5 °C Aligned</div><div>Pledges</div><div>High-emission</div></div>`;
-  const rows = FORECAST_IMPACTS.map((r) => {
-    const s = SOURCES[r.src];
-    return `<div class="fcmp-row">
+  const a = scenarioById(cmp[0]), b = scenarioById(cmp[1]);
+  const cls = (s) => (s.color === "ice" ? "v-ice" : "v-ember");
+  const head = `<div class="fcmp-row head fcmp3"><div>Endpoint impact</div><div class="${cls(a)}">${a.name}</div><div class="${cls(b)}">${b.name}</div></div>`;
+  const rows = FORECAST_IMPACTS.map((r) =>
+    `<div class="fcmp-row fcmp3">
       <div class="k" data-k="Impact">${r.k}</div>
-      <div class="v-ice" data-k="1.5 °C Aligned">${r.aligned}</div>
-      <div data-k="Pledges">${r.pledges}</div>
-      <div class="v-ember" data-k="High-emission">${r.worst}</div>
-    </div>`;
-  }).join("");
-  byId("forecastCompare").innerHTML = head + rows;
+      <div class="${cls(a)}" data-k="${a.name}">${r.byPath[cmp[0]]}</div>
+      <div class="${cls(b)}" data-k="${b.name}">${r.byPath[cmp[1]]}</div>
+    </div>`).join("");
+  byId("forecastCompare").innerHTML = head + rows +
+    `<div class="fcmp-src">By pathway at 2100 / mid-century (not per horizon). Sources: <a href="https://www.ipcc.ch/report/ar6/syr/" target="_blank" rel="noopener">IPCC AR6</a> · <a href="https://www.worldbank.org/en/news/feature/2021/09/13/millions-on-the-move-in-their-own-countries-the-human-face-of-climate-change" target="_blank" rel="noopener">World Bank Groundswell</a>.</div>`;
+}
+
+/* ═══ P1-5 · LOCALISE THE FORECAST (Open-Meteo downscaled CMIP6) ═══
+   Opt-in. Coordinates query only the projection API. Falls back to the
+   selected country's pathway when local data is unavailable. */
+function flStatus(m) { const el = byId("flStatus"); if (el) el.textContent = m; }
+window.localiseForecast = function () {
+  if (!navigator.geolocation) { flStatus("Geolocation isn't available — type a place instead."); return; }
+  flStatus("Asking your browser for permission…");
+  navigator.geolocation.getCurrentPosition(
+    (p) => runLocalForecast(p.coords.latitude, p.coords.longitude),
+    (e) => flStatus(e.code === 1 ? "Permission declined — type a place instead." : "Couldn't get your location — type a place."),
+    { timeout: 10000, maximumAge: 600000 });
+};
+async function flReverseGeocode(lat, lng) {
+  try {
+    const j = await (await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`)).json();
+    return [j.city || j.locality, j.countryCode].filter(Boolean).join(", ") || "your area";
+  } catch (_) { return "your area"; }
+}
+async function runLocalForecast(lat, lng, label) {
+  flStatus("Loading your area's climate projection…");
+  window.__madForecastLoc = { lat, lng, label: label || null };
+  saveState();
+  try {
+    if (!label) label = await flReverseGeocode(lat, lng);
+    const url = `https://climate-api.open-meteo.com/v1/climate?latitude=${lat}&longitude=${lng}` +
+      `&start_date=2000-01-01&end_date=2049-12-31&models=MRI_AGCM3_2_S&daily=temperature_2m_mean,temperature_2m_max&temperature_unit=celsius`;
+    const j = await (await fetch(url)).json();
+    const t = j.daily.time, mean = j.daily.temperature_2m_mean, mx = j.daily.temperature_2m_max;
+    const yr = {}; // year → {sum,n,hot}
+    for (let i = 0; i < t.length; i++) {
+      const y = +t[i].slice(0, 4);
+      const o = (yr[y] = yr[y] || { sum: 0, n: 0, hot: 0 });
+      if (mean[i] != null) { o.sum += mean[i]; o.n++; }
+      if (mx[i] != null && mx[i] >= 30) o.hot++;
+    }
+    const decMean = (a, b) => { let s = 0, c = 0; for (let y = a; y <= b; y++) if (yr[y] && yr[y].n) { s += yr[y].sum / yr[y].n; c++; } return c ? s / c : null; };
+    const decHot = (a, b) => { let s = 0, c = 0; for (let y = a; y <= b; y++) if (yr[y]) { s += yr[y].hot; c++; } return c ? s / c : null; };
+    const m2000 = decMean(2000, 2009), m2040 = decMean(2040, 2049);
+    const h2010 = decHot(2010, 2019), h2040 = decHot(2040, 2049);
+    if (m2000 == null || m2040 == null) throw new Error("insufficient data");
+    const warming = m2040 - m2000;
+    byId("flResult").innerHTML = `
+      <div class="fl-place">${label}</div>
+      <div class="fl-grid">
+        <div class="fl-stat"><div class="fl-v ember">+${warming.toFixed(1)} °C</div><div class="fl-k">annual mean warming, 2000s → 2040s</div></div>
+        <div class="fl-stat"><div class="fl-v">${m2000.toFixed(1)} → ${m2040.toFixed(1)} °C</div><div class="fl-k">local average temperature</div></div>
+        ${h2010 != null && h2040 != null ? `<div class="fl-stat"><div class="fl-v ember">${Math.round(h2010)} → ${Math.round(h2040)}</div><div class="fl-k">days above 30 °C per year</div></div>` : ""}
+      </div>
+      <div class="fl-src">Downscaled CMIP6 (MRI-AGCM3-2-S, high-emission), via <a href="https://open-meteo.com/en/docs/climate-api" target="_blank" rel="noopener">Open-Meteo Climate API ↗</a>. One model shown; the direction, not the decimal, is the point.</div>`;
+    byId("flResult").classList.add("show");
+    flStatus("");
+  } catch (e) {
+    byId("flResult").classList.remove("show");
+    flStatus(selectedCountry
+      ? `Couldn't load a local projection here. Your country, ${selectedCountry[0]}, is rated "${selectedCountry[2]}" against the 1.5 °C pathway (Climate Action Tracker).`
+      : "Couldn't load a local projection. Try again, or pick your country below.");
+  }
+}
+function initLocalForecastSearch() {
+  const inp = byId("flSearch");
+  if (!inp) return;
+  inp.addEventListener("keydown", async (e) => {
+    if (e.key !== "Enter") return;
+    const q = inp.value.trim(); if (!q) return;
+    flStatus("Looking up '" + q + "'…");
+    try {
+      const r = await (await fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&language=en&format=json&name=" + encodeURIComponent(q))).json();
+      if (r.results && r.results[0]) { const g = r.results[0]; runLocalForecast(g.latitude, g.longitude, [g.name, g.country_code].filter(Boolean).join(", ")); }
+      else flStatus("Couldn't find '" + q + "'. Try a larger town or city.");
+    } catch (_) { flStatus("Place lookup failed — check your connection."); }
+  });
 }
 
 /* ═══ CODA · STEP 01 · PRIORITIES (select = rank) ═══ */
 function buildPriorities() {
   const grid = byId("prioGrid");
-  grid.innerHTML = PRIORITIES.map((p, i) =>
-    `<button class="prio-card" data-i="${i}" aria-pressed="false">
+  grid.innerHTML = PRIORITIES.map((p, i) => {
+    const s = SOURCES[p.src];
+    return `<div class="prio-card" data-i="${i}" role="button" tabindex="0" aria-pressed="false">
       <span class="prio-rank">${i + 1}</span>
-      <span><span class="prio-name">${p.name}</span><span class="prio-desc">${p.desc}</span></span>
-    </button>`).join("");
-  grid.querySelectorAll(".prio-card").forEach((b) => b.addEventListener("click", () => togglePriority(+b.dataset.i)));
+      <span class="prio-body"><span class="prio-name">${p.name}</span><span class="prio-desc">${p.desc}</span>
+        <a class="prio-src" href="${s.url}" target="_blank" rel="noopener">${s.label.split(" · ")[0]} ↗</a></span>
+    </div>`;
+  }).join("");
+  grid.querySelectorAll(".prio-card").forEach((b) => {
+    b.addEventListener("click", (e) => { if (!e.target.closest(".prio-src")) togglePriority(+b.dataset.i); });
+    b.addEventListener("keydown", (e) => {
+      if ((e.key === "Enter" || e.key === " ") && !e.target.closest(".prio-src")) { e.preventDefault(); togglePriority(+b.dataset.i); }
+    });
+  });
 }
 function togglePriority(i) {
   const at = ranking.indexOf(i);
@@ -432,12 +562,14 @@ function generateLetter() {
   if (note) note.classList.toggle("show", !(rankDone && countryDone));
 
   const RED = (t) => `<span class="letter-redfill">${t}</span>`;
-  // some country names take a definite article ("the United Kingdom")
-  const withArticle = (c) => (/^United |^Netherlands$|^Czech|^Philippines$/.test(c) ? "the " + c : c);
   const name = (byId("letterName")?.value || "").trim() || "A concerned citizen";
   const leaderRaw = (byId("letterLeader")?.value || "").trim();
   const country = countryDone ? selectedCountry[0] : RED("[your country]");
-  const leader = leaderRaw || (countryDone ? `Head of Government of ${withArticle(selectedCountry[0])}` : RED("[your head of state]"));
+  // per-country office (President / Prime Minister / Chancellor / King) — the
+  // stable institution, so no head-of-state NAME can go stale. If the reader
+  // types a specific name it takes precedence.
+  const office = countryDone ? (selectedCountry[5] || "Head of Government") : null;
+  const leader = leaderRaw || (countryDone ? office : RED("[your head of state]"));
   const perCapLine = countryDone
     ? `${selectedCountry[0]} emits about ${selectedCountry[3]} tonnes of CO₂ per person each year, and its current climate plan is rated "${selectedCountry[2]}" against the 1.5 °C pathway.`
     : RED("[Pick your country below to show its emissions and its 1.5 °C alignment.]");
@@ -475,6 +607,7 @@ ${country}`;
   if (contact) contact.innerHTML = countryDone && selectedCountry[4]
     ? `When you're ready, here is the official contact route for ${selectedCountry[0]}: <a href="${selectedCountry[4]}" target="_blank" rel="noopener">${selectedCountry[4]} ↗</a>`
     : "";
+  saveState(); // persist the journey (P1-8); guarded during restore
 }
 window.copyLetter = function () {
   const out = byId("letterOutput");
@@ -541,7 +674,6 @@ function buildGlobalPriorities() {
       const p = PRIORITIES[x.i], col = p.color === "ice" ? "var(--ice)" : "var(--ember)";
       return `<div class="gp-row"><div class="gp-name">${p.name}</div><div class="gp-track"><div class="gp-fill" style="background:${col};width:0" data-w="${((x.w / max) * 100).toFixed(0)}"></div></div><div class="gp-pct">${((x.w / max) * 100).toFixed(0)}%</div></div>`;
     }).join("");
-  animateBars(wrap.querySelector(".gp-row") ? { querySelectorAll: (s) => wrap.querySelectorAll(".gp-fill") } : wrap);
   const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { wrap.querySelectorAll(".gp-fill").forEach((b) => b.style.width = b.dataset.w + "%"); io.disconnect(); } }), { threshold: 0.15 });
   io.observe(wrap);
 }
@@ -735,6 +867,57 @@ function initGlobeLazy() {
 }
 window.onMadHydrated = function () { renderCoalitionCount(); buildGlobalPriorities(); refreshGlobe(); };
 
+/* ═══ STATE PERSISTENCE (P1-8) ═══
+   Everything the reader builds — ranked priorities, country, letter draft,
+   hazard radius, local forecast location — survives a refresh. Stored ONLY in
+   this browser's localStorage; never sent to any backend. */
+function saveState() {
+  if (!hydrated || restoringState) return;
+  try {
+    localStorage.setItem(STATE_KEY, JSON.stringify({
+      priorityOrder: ranking,
+      country: selectedCountry ? selectedCountry[0] : null,
+      letterName: byId("letterName")?.value || "",
+      letterLeader: byId("letterLeader")?.value || "",
+      letterDraft: letterEdited ? (byId("letterOutput")?.innerText || "") : null,
+      radius: window.__madRadius || 250,
+      localForecastLocation: window.__madForecastLoc || null,
+      lastUpdated: Date.now(),
+    }));
+  } catch (e) {}
+}
+window.saveState = saveState; // let hazard.js persist radius changes
+function loadState() {
+  let s;
+  try { s = JSON.parse(localStorage.getItem(STATE_KEY) || "null"); } catch (e) { return; }
+  if (!s) return;
+  restoringState = true;
+  if (Array.isArray(s.priorityOrder)) ranking = s.priorityOrder.filter((i) => i >= 0 && i < PRIORITIES.length);
+  if (s.letterName && byId("letterName")) byId("letterName").value = s.letterName;
+  if (s.letterLeader && byId("letterLeader")) byId("letterLeader").value = s.letterLeader;
+  renderPriorities();
+  if (s.country) { const sel = byId("countrySelect"); if (sel) { sel.value = s.country; window.showCountry(s.country); } }
+  if (s.radius && typeof window.setRadius === "function") { window.__madRadius = s.radius; window.setRadius(s.radius); }
+  if (s.localForecastLocation) window.__madForecastLoc = s.localForecastLocation;
+  if (s.letterDraft) {
+    letterEdited = true;
+    const o = byId("letterOutput");
+    if (o) { o.innerHTML = s.letterDraft.replace(/\n/g, "<br>"); o.dataset.plain = s.letterDraft; }
+    if (byId("letterNote")) byId("letterNote").classList.remove("show");
+  }
+  restoringState = false;
+}
+window.clearMadState = function () {
+  try { localStorage.removeItem(STATE_KEY); } catch (e) {}
+  ranking = []; selectedCountry = null; letterEdited = false;
+  const sel = byId("countrySelect"); if (sel) sel.value = "";
+  byId("countryCard")?.classList.remove("show");
+  if (byId("letterName")) byId("letterName").value = "";
+  if (byId("letterLeader")) byId("letterLeader").value = "";
+  renderPriorities();
+  const btn = byId("clearStateBtn"); if (btn) { const o = btn.textContent; btn.textContent = "✓ Cleared"; setTimeout(() => (btn.textContent = o), 1800); }
+};
+
 /* ═══ INIT ═══ */
 function init() {
   initBg();
@@ -749,6 +932,14 @@ function init() {
   buildPriorities(); renderPriorities();
   buildCountrySelect();
   renderCoalitionCount(); buildGlobalPriorities(); initGlobeLazy();
+  // letter hand-edits mark the draft dirty so it persists across refresh
+  byId("letterOutput")?.addEventListener("input", () => { letterEdited = true; saveState(); });
+  initLocalForecastSearch();
+  loadState(); // restore any saved journey last, once the DOM is built
+  hydrated = true; // now enable persistence for real user actions (P1-8)
+  // repopulate a saved local forecast (a stored coordinate, no new geolocation)
+  const fl = window.__madForecastLoc;
+  if (fl && fl.lat != null) runLocalForecast(fl.lat, fl.lng, fl.label);
 }
 if (document.readyState !== "loading") init();
 else document.addEventListener("DOMContentLoaded", init);

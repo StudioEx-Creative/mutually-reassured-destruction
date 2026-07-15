@@ -265,23 +265,34 @@ const LEDGER_NOTE = "Shares of cumulative fossil & industrial CO₂ since 1850, 
 
 /* 03b · CORPORATIONS. Carbon Majors (InfluenceMap 2024 update). Top
    producers by cumulative emissions traced. */
+/* Top entities by CUMULATIVE emissions 1854–2024 (InfluenceMap Carbon Majors
+   2024 update, Table 2). cum = % of all global fossil & cement CO₂ since 1854;
+   y2024 = % of 2024 global (Table 1) where in the annual top-20. own:
+   investor | state (state-owned company) | nation (direct nation-state
+   production, mostly historical). Every entity carries a named owner or a
+   current chief executive (verified 2026). rev = approx. 2024 revenue for the
+   investor-owned majors + Aramco (public reports), shown with ≈. */
 const CARBON_MAJORS = [
-  { name: "Saudi Aramco", type: "State", note: "Saudi Arabia" },
-  { name: "Gazprom", type: "State", note: "Russia" },
-  { name: "Coal India", type: "State", note: "India" },
-  { name: "National Iranian Oil Co.", type: "State", note: "Iran" },
-  { name: "Jinneng Group", type: "State", note: "China (coal)" },
-  { name: "China (state coal production)", type: "State", note: "China" },
-  { name: "ExxonMobil", type: "Investor", note: "United States" },
-  { name: "Chevron", type: "Investor", note: "United States" },
-  { name: "Shell", type: "Investor", note: "United Kingdom" },
-  { name: "BP", type: "Investor", note: "United Kingdom" },
-  { name: "TotalEnergies", type: "Investor", note: "France" },
-  { name: "Pemex", type: "State", note: "Mexico" },
+  { name: "Former Soviet Union", own: "nation", hq: "USSR (1900–1991)", cum: 6.54, leader: "State production; dissolved 1991" },
+  { name: "China (state coal)", own: "nation", hq: "China (1945–2004)", cum: 5.10, leader: "State coal production" },
+  { name: "Saudi Aramco", own: "state", hq: "Saudi Arabia", cum: 3.66, y2024: 4.28, leader: "State-owned · CEO Amin H. Nasser", rev: "≈$436bn" },
+  { name: "Chevron", own: "investor", hq: "United States", cum: 3.08, leader: "CEO Mike Wirth", rev: "≈$193bn" },
+  { name: "ExxonMobil", own: "investor", hq: "United States", cum: 2.79, leader: "CEO Darren Woods", rev: "≈$339bn" },
+  { name: "Gazprom", own: "state", hq: "Russia", cum: 2.33, y2024: 2.76, leader: "State-owned · CEO Alexey Miller" },
+  { name: "National Iranian Oil Co.", own: "state", hq: "Iran", cum: 2.25, y2024: 3.13, leader: "State-owned (Government of Iran)" },
+  { name: "BP", own: "investor", hq: "United Kingdom", cum: 2.13, leader: "CEO Meg O'Neill (from Apr 2026)", rev: "≈$189bn" },
+  { name: "Shell", own: "investor", hq: "United Kingdom", cum: 2.02, y2024: 0.97, leader: "CEO Wael Sawan", rev: "≈$284bn" },
+  { name: "Coal India", own: "state", hq: "India", cum: 1.71, y2024: 3.92, leader: "State-owned (Government of India)" },
+  { name: "Pemex", own: "state", hq: "Mexico", cum: 1.31, leader: "State-owned (Government of Mexico)" },
+  { name: "CHN Energy", own: "state", hq: "China", cum: 1.23, y2024: 3.91, leader: "State-owned (Government of China)" },
+  { name: "ConocoPhillips", own: "investor", hq: "United States", cum: 1.19, leader: "CEO Ryan Lance", rev: "≈$57bn" },
+  { name: "CNPC (PetroChina)", own: "state", hq: "China", cum: 1.00, y2024: 1.70, leader: "State-owned (Government of China)" },
+  { name: "ADNOC", own: "state", hq: "United Arab Emirates", cum: 0.92, leader: "State-owned (Government of the UAE)" },
+  { name: "TotalEnergies", own: "investor", hq: "France", cum: 0.91, leader: "CEO Patrick Pouyanné", rev: "≈$195bn" },
 ];
 const CARBON_MAJORS_STAT = {
   headline: "122 entities",
-  body: "are responsible for about 72% of all fossil-fuel and cement CO₂ since 1854. In the 2024 update, just 169 active producers accounted for ~80% of global fossil and cement CO₂ — and 17 of the top 20 are controlled by states that opposed a COP30 fossil-fuel phase-out.",
+  body: "are responsible for about 72% of all fossil-fuel and cement CO₂ since 1854. The top 20 alone account for 872 GtCO₂e — 42.5% of the global total — and 17 of them are state-controlled. In 2024, just 32 companies produced over half of all fossil CO₂.",
   subsidy: "$7 trillion",
   subsidyBody: "in fossil-fuel subsidies in 2022 (IMF, explicit + implicit) — about 7% of global GDP, and more than the world spends on education.",
 };
@@ -290,23 +301,33 @@ const CARBON_MAJORS_STAT = {
    documented. Dates are factual; figures carry their source inline. */
 const POLICY_TIMELINE = [
   { year: 1992, title: "UNFCCC adopted", body: "The Rio framework — nations agree to 'prevent dangerous anthropogenic interference' with the climate. No binding targets.", kind: "treaty" },
-  { year: 1997, title: "Kyoto Protocol", body: "First binding emissions targets for developed nations. The United States signs but never ratifies.", kind: "treaty" },
-  { year: 2009, title: "Copenhagen (COP15)", body: "Talks collapse without a binding successor to Kyoto. A $100 bn/yr climate-finance pledge is made — and repeatedly missed.", kind: "setback" },
+  { year: 1997, title: "Kyoto Protocol", body: "First binding emissions targets for developed nations. The United States signs but never ratifies.", kind: "treaty", lobby: "US fossil & auto interests fund the Global Climate Coalition to oppose ratification (InfluenceMap)." },
+  { year: 2009, title: "Copenhagen (COP15)", body: "Talks collapse without a binding successor to Kyoto. A $100 bn/yr climate-finance pledge is made — and repeatedly missed.", kind: "setback", lobby: "US oil, gas & coal lobbying spending peaks near $175 m in 2009 as cap-and-trade dies in the Senate (OpenSecrets)." },
   { year: 2015, title: "Paris Agreement", body: "196 parties agree to hold warming 'well below 2 °C' and pursue 1.5 °C. Targets are nationally set and non-binding.", kind: "treaty" },
   { year: 2017, title: "US announces Paris withdrawal", body: "The first US exit from Paris is announced; the country formally leaves in 2020, rejoins in 2021, and exits again in 2025.", kind: "setback" },
-  { year: 2021, title: "Glasgow (COP26)", body: "First COP text to name coal — weakened from 'phase out' to 'phase down' in the final hours.", kind: "treaty" },
-  { year: 2022, title: "US Inflation Reduction Act", body: "The largest climate investment in US history — about $369 bn for clean energy.", kind: "win" },
-  { year: 2023, title: "Dubai (COP28)", body: "First global stocktake calls for 'transitioning away from fossil fuels' — the first COP to do so, without a hard deadline.", kind: "treaty" },
-  { year: 2025, title: "Ten years after Paris", body: "Climate Action Tracker reports the warming outlook has barely moved for four straight years; new 2035 targets make no measurable difference.", kind: "setback" },
+  { year: 2019, title: "EU Green Deal", body: "The EU commits to climate neutrality by 2050 and a 55% cut by 2030 — the largest binding framework of any major economy.", kind: "win" },
+  { year: 2021, title: "Glasgow (COP26)", body: "First COP text to name coal — weakened from 'phase out' to 'phase down' in the final hours.", kind: "treaty", lobby: "503 fossil-fuel lobbyists registered — a larger delegation than any single country (Global Witness / KBPO)." },
+  { year: 2022, title: "US Inflation Reduction Act", body: "The largest climate investment in US history — about $369 bn for clean energy.", kind: "win", lobby: "Oil & gas set a record ~$125 m in US federal lobbying in 2022 (OpenSecrets)." },
+  { year: 2023, title: "Dubai (COP28)", body: "First global stocktake calls for 'transitioning away from fossil fuels' — the first COP to do so, without a hard deadline.", kind: "treaty", lobby: "At least 2,456 fossil-fuel lobbyists granted access — a record, at a summit chaired by an oil-company chief (KBPO)." },
+  { year: 2024, title: "Baku (COP29)", body: "A new climate-finance goal of $300 bn/yr by 2035 is agreed — less than a quarter of what developing nations say they need.", kind: "setback", lobby: "1,773 fossil-fuel lobbyists registered — more than the ten most climate-vulnerable nations' delegations combined (KBPO)." },
+  { year: 2025, title: "Belém (COP30) · ten years after Paris", body: "Climate Action Tracker reports the warming outlook has barely moved for four straight years; new 2035 targets make no measurable difference. 17 of the 20 largest 2024 emitters are controlled by states that opposed a fossil-fuel phase-out.", kind: "setback" },
 ];
-const LOBBY_NOTE = "Fossil-fuel interests have fielded more delegates at recent COPs than almost any single nation. Documented lobbying spend and access: InfluenceMap, OpenSecrets, the EU Transparency Register, and the Kick Big Polluters Out coalition's COP badge counts.";
+const LOBBY_NOTE = "The trajectory above was lobbied for and against by named interests. Fossil-fuel delegations now outnumber almost every nation at the talks. Sources: OpenSecrets (US federal lobbying), the Kick Big Polluters Out coalition and Global Witness (COP badge counts), InfluenceMap and the EU Transparency Register.";
 
-/* Curated, high-credibility headline feed (build-time; outlet + date visible). */
+/* Curated feed of high-credibility journalism & primary data releases. Real
+   articles, real URLs, dated. Intended to be refreshed at build time via
+   scripts/fetch.mjs (RSS→JSON); shipped hand-verified June 2026. */
 const NEWS_FEED = [
-  { outlet: "Reuters", date: "2025", head: "Fossil-fuel CO₂ emissions set another record in 2025, scientists report", src: "gcp" },
-  { outlet: "AP", date: "2025", head: "World breached 1.5 °C across a three-year average for the first time", src: "wmo" },
-  { outlet: "The Guardian", date: "2025", head: "Tropical forest loss hit record high in 2024, driven by fire", src: "gfw" },
-  { outlet: "Carbon Brief", date: "2025", head: "Analysis: remaining 1.5 °C carbon budget down to about four years", src: "gcp" },
+  { outlet: "Carbon Brief", date: "Apr 2026", head: "Analysis: China's CO₂ climbs 2% in early 2026 as 'wasted' wind and solar force more coal", url: "https://www.carbonbrief.org/analysis-chinas-co2-climbs-2-in-early-2026-due-to-wasted-wind-and-solar/" },
+  { outlet: "IEA", date: "2026", head: "Global Energy Review 2026: CO₂ emissions reach a new record", url: "https://www.iea.org/reports/global-energy-review-2026/co2-emissions" },
+  { outlet: "Climate TRACE", date: "Jan 2026", head: "January 2026 emissions data released, tracing emissions to their source", url: "https://climatetrace.org/news/climate-trace-releases-january-2026-emissions-data" },
+  { outlet: "Ember", date: "2025", head: "Wind and solar overtook fossil fuels in EU electricity for the first time", url: "https://ember-energy.org/" },
+  { outlet: "Global Carbon Project", date: "Nov 2025", head: "Fossil-fuel CO₂ emissions set another record in 2025", url: "https://globalcarbonbudget.org/" },
+  { outlet: "WMO", date: "2025", head: "World breached 1.5 °C across a three-year average for the first time", url: "https://wmo.int/news/media-centre/wmo-confirms-2025-was-one-of-warmest-years-record" },
+  { outlet: "WRI / Global Forest Watch", date: "2025", head: "Tropical forest loss shatters records in 2024, fuelled by fire", url: "https://www.wri.org/news/release-global-forest-loss-shatters-records-2024-fueled-massive-fires" },
+  { outlet: "Climate Action Tracker", date: "Nov 2025", head: "Little change in the warming outlook for a fourth year; new 2035 targets make no difference", url: "https://climateactiontracker.org/publications/warming-projections-global-update-2025/" },
+  { outlet: "InfluenceMap", date: "2025", head: "17 of the top 20 emitters in 2024 controlled by countries that opposed a COP30 fossil-fuel phase-out", url: "https://influencemap.org/pressrelease/Carbon-Majors-2024-Data-Update-35610" },
+  { outlet: "Copernicus C3S", date: "Jan 2026", head: "2025 was the third-hottest year on record, following the two warmest", url: "https://climate.copernicus.eu/copernicus-2025-was-third-hottest-year-record" },
 ];
 
 /* ═══ CHAPTER 04 · THE FORECAST ════════════════════════════════════
@@ -367,12 +388,19 @@ const SCENARIOS = [
     src: "ipcc_ar6",
   },
 ];
+/* Endpoint impacts BY PATHWAY (at 2100, or mid-century where noted). Keyed by
+   scenario id so the comparison table shows whichever two pathways the reader
+   is comparing. Temperature & sea-level are shown per-horizon in the cards;
+   these endpoint impacts are only cleanly published by warming level, not per
+   intermediate year — so per the brief's rule we show them by pathway, not per
+   horizon, and omit any output we can't source across all four (e.g. a global
+   forest-cover % projection). Source: IPCC AR6; World Bank Groundswell. */
 const FORECAST_IMPACTS = [
-  { k: "Sea level rise (2100)", aligned: "0.3–0.6 m", pledges: "0.5–0.7 m", worst: "0.6–1.0 m+", src: "ipcc_ar6" },
-  { k: "Ice-free Arctic summers", aligned: "rare", pledges: "regular by 2050", worst: "routine", src: "ipcc_ar6" },
-  { k: "Coral reefs remaining", aligned: "~10–30%", pledges: "~1%", worst: "~0%", src: "ipcc_ar6" },
-  { k: "People in chronic extreme heat", aligned: "hundreds of millions", pledges: "~2 billion+", worst: "~3 billion+", src: "ipcc_ar6" },
-  { k: "People displaced by 2050", aligned: "tens of millions", pledges: "up to 216 million", worst: "200 million+", src: "groundswell" },
+  { k: "Sea-level rise by 2100 (likely)", byPath: { current: "0.6–0.8 m", pledges: "0.5–0.7 m", aligned: "0.3–0.6 m", worst: "0.6–1.0 m+" }, src: "ipcc_ar6" },
+  { k: "Ice-free Arctic summers", byPath: { current: "regular", pledges: "regular by ~2050", aligned: "rare", worst: "routine" }, src: "ipcc_ar6" },
+  { k: "Coral reefs remaining", byPath: { current: "~1%", pledges: "~1%", aligned: "~10–30%", worst: "~0%" }, src: "ipcc_ar6" },
+  { k: "People in chronic extreme heat", byPath: { current: "~2 billion+", pledges: "~2 billion+", aligned: "hundreds of millions", worst: "~3 billion+" }, src: "ipcc_ar6" },
+  { k: "People displaced by 2050 (internal)", byPath: { current: "up to 216 million", pledges: "up to 216 million", aligned: "tens of millions", worst: "200 million+" }, src: "groundswell" },
 ];
 
 /* ═══ CODA · STEP 01 · PRIORITIES ══════════════════════════════════
@@ -398,40 +426,40 @@ const PRIORITIES = [
    contact route]. CAT rates ~40 governments; others marked "not rated".
    Contact routes are official parliament/government channels. */
 const COUNTRIES = [
-  ["United States", "US", "Insufficient", 14.3, "https://www.usa.gov/elected-officials"],
-  ["China", "CN", "Highly insufficient", 8.4, "http://www.gov.cn/"],
-  ["India", "IN", "Highly insufficient", 2.1, "https://www.mygov.in/"],
-  ["United Kingdom", "GB", "Almost sufficient", 4.5, "https://www.writetothem.com/"],
-  ["Germany", "DE", "Insufficient", 7.7, "https://www.bundestag.de/en/members"],
-  ["France", "FR", "Insufficient", 4.2, "https://www.assemblee-nationale.fr/"],
-  ["Japan", "JP", "Insufficient", 8.5, "https://www.sangiin.go.jp/eng/"],
-  ["Russia", "RU", "Critically insufficient", 11.4, "http://government.ru/en/"],
-  ["Brazil", "BR", "Almost sufficient", 2.3, "https://www.gov.br/planalto/"],
-  ["Canada", "CA", "Insufficient", 14.0, "https://www.ourcommons.ca/members/en"],
-  ["Australia", "AU", "Insufficient", 14.8, "https://www.aph.gov.au/Senators_and_Members"],
-  ["Indonesia", "ID", "Insufficient", 2.6, "https://www.dpr.go.id/"],
-  ["South Africa", "ZA", "Insufficient", 6.7, "https://www.parliament.gov.za/"],
-  ["Mexico", "MX", "Critically insufficient", 3.6, "https://www.gob.mx/presidencia"],
-  ["Saudi Arabia", "SA", "Critically insufficient", 18.2, "https://www.my.gov.sa/"],
-  ["South Korea", "KR", "Highly insufficient", 11.6, "https://www.assembly.go.kr/portal/eng/"],
-  ["Turkey", "TR", "Critically insufficient", 5.3, "https://www.tbmm.gov.tr/"],
-  ["Italy", "IT", "Insufficient", 5.4, "https://www.camera.it/"],
-  ["Spain", "ES", "Insufficient", 5.1, "https://www.congreso.es/"],
-  ["Nigeria", "NG", "not rated", 0.6, "https://www.nass.gov.ng/"],
-  ["Argentina", "AR", "Insufficient", 3.7, "https://www.argentina.gob.ar/"],
-  ["Netherlands", "NL", "Insufficient", 7.3, "https://www.houseofrepresentatives.nl/"],
-  ["Poland", "PL", "Insufficient", 8.0, "https://www.sejm.gov.pl/"],
-  ["Egypt", "EG", "Highly insufficient", 2.3, "https://www.parliament.gov.eg/"],
-  ["Pakistan", "PK", "not rated", 0.9, "https://www.na.gov.pk/"],
-  ["Bangladesh", "BD", "not rated", 0.6, "https://www.parliament.gov.bd/"],
-  ["Vietnam", "VN", "Critically insufficient", 3.5, "https://quochoi.vn/"],
-  ["Sweden", "SE", "Insufficient", 3.6, "https://www.riksdagen.se/en/"],
-  ["Norway", "NO", "Insufficient", 6.9, "https://www.stortinget.no/en/"],
-  ["Kenya", "KE", "Almost sufficient", 0.4, "https://www.parliament.go.ke/"],
-  ["Ethiopia", "ET", "Almost sufficient", 0.2, "https://www.hopr.gov.et/"],
-  ["United Arab Emirates", "AE", "Insufficient", 20.5, "https://www.government.ae/"],
-  ["New Zealand", "NZ", "Highly insufficient", 6.3, "https://www.parliament.nz/en/mps-and-electorates/members-of-parliament/"],
-  ["Switzerland", "CH", "Insufficient", 4.0, "https://www.parlament.ch/en"],
+  ["United States", "US", "Insufficient", 14.3, "https://www.usa.gov/elected-officials", "President"],
+  ["China", "CN", "Highly insufficient", 8.4, "http://www.gov.cn/", "President"],
+  ["India", "IN", "Highly insufficient", 2.1, "https://www.mygov.in/", "Prime Minister"],
+  ["United Kingdom", "GB", "Almost sufficient", 4.5, "https://www.writetothem.com/", "Prime Minister"],
+  ["Germany", "DE", "Insufficient", 7.7, "https://www.bundestag.de/en/members", "Chancellor"],
+  ["France", "FR", "Insufficient", 4.2, "https://www.assemblee-nationale.fr/", "President"],
+  ["Japan", "JP", "Insufficient", 8.5, "https://www.sangiin.go.jp/eng/", "Prime Minister"],
+  ["Russia", "RU", "Critically insufficient", 11.4, "http://government.ru/en/", "President"],
+  ["Brazil", "BR", "Almost sufficient", 2.3, "https://www.gov.br/planalto/", "President"],
+  ["Canada", "CA", "Insufficient", 14.0, "https://www.ourcommons.ca/members/en", "Prime Minister"],
+  ["Australia", "AU", "Insufficient", 14.8, "https://www.aph.gov.au/Senators_and_Members", "Prime Minister"],
+  ["Indonesia", "ID", "Insufficient", 2.6, "https://www.dpr.go.id/", "President"],
+  ["South Africa", "ZA", "Insufficient", 6.7, "https://www.parliament.gov.za/", "President"],
+  ["Mexico", "MX", "Critically insufficient", 3.6, "https://www.gob.mx/presidencia", "President"],
+  ["Saudi Arabia", "SA", "Critically insufficient", 18.2, "https://www.my.gov.sa/", "King"],
+  ["South Korea", "KR", "Highly insufficient", 11.6, "https://www.assembly.go.kr/portal/eng/", "President"],
+  ["Turkey", "TR", "Critically insufficient", 5.3, "https://www.tbmm.gov.tr/", "President"],
+  ["Italy", "IT", "Insufficient", 5.4, "https://www.camera.it/", "Prime Minister"],
+  ["Spain", "ES", "Insufficient", 5.1, "https://www.congreso.es/", "Prime Minister"],
+  ["Nigeria", "NG", "not rated", 0.6, "https://www.nass.gov.ng/", "President"],
+  ["Argentina", "AR", "Insufficient", 3.7, "https://www.argentina.gob.ar/", "President"],
+  ["Netherlands", "NL", "Insufficient", 7.3, "https://www.houseofrepresentatives.nl/", "Prime Minister"],
+  ["Poland", "PL", "Insufficient", 8.0, "https://www.sejm.gov.pl/", "Prime Minister"],
+  ["Egypt", "EG", "Highly insufficient", 2.3, "https://www.parliament.gov.eg/", "President"],
+  ["Pakistan", "PK", "not rated", 0.9, "https://www.na.gov.pk/", "Prime Minister"],
+  ["Bangladesh", "BD", "not rated", 0.6, "https://www.parliament.gov.bd/", "Head of Government"],
+  ["Vietnam", "VN", "Critically insufficient", 3.5, "https://quochoi.vn/", "Prime Minister"],
+  ["Sweden", "SE", "Insufficient", 3.6, "https://www.riksdagen.se/en/", "Prime Minister"],
+  ["Norway", "NO", "Insufficient", 6.9, "https://www.stortinget.no/en/", "Prime Minister"],
+  ["Kenya", "KE", "Almost sufficient", 0.4, "https://www.parliament.go.ke/", "President"],
+  ["Ethiopia", "ET", "Almost sufficient", 0.2, "https://www.hopr.gov.et/", "Prime Minister"],
+  ["United Arab Emirates", "AE", "Insufficient", 20.5, "https://www.government.ae/", "President"],
+  ["New Zealand", "NZ", "Highly insufficient", 6.3, "https://www.parliament.nz/en/mps-and-electorates/members-of-parliament/", "Prime Minister"],
+  ["Switzerland", "CH", "Insufficient", 4.0, "https://www.parlament.ch/en", "President"],
 ];
 
 /* Globe coordinates [lat, lng] for the coalition globe (Coda step 04). */
