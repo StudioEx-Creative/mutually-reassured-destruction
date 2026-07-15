@@ -62,8 +62,10 @@
 
   window.setRadius = function (km) {
     radiusKm = km;
+    window.__madRadius = km; // for state persistence (P1-8)
     document.querySelectorAll(".radius-btn").forEach((b) =>
       b.classList.toggle("on", +b.dataset.r === km));
+    if (typeof window.saveState === "function") window.saveState();
     if (loc) refresh();
   };
 

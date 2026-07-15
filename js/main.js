@@ -10,6 +10,10 @@ const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").match
 let ranking = [];            // ordered priority indices = the user's ranking
 let selectedCountry = null;  // [name, iso, rating, perCap, contactUrl]
 let indSort = "departure";
+let restoringState = false;  // guards saveState() while loadState() runs
+let hydrated = false;        // saveState() is inert until init + loadState finish
+let letterEdited = false;    // true once the user hand-edits the letter body
+const STATE_KEY = "mad-state-v1"; // localStorage key (P1-8), never sent anywhere
 
 /* ═══ FORMAT ═══ */
 const famColor = (f) => (f === "ice" ? getCss("--ice") : getCss("--ember"));
@@ -113,7 +117,7 @@ function buildCards() {
   grid.innerHTML = order.map((i) => {
     const d = INDICATORS[i];
     const col = d.family === "ice" ? "var(--ice)" : "var(--ember)";
-    return `<button class="indcard ${d.family === "ice" ? "ice" : "heat"}" data-i="${i}" aria-label="${d.name}, ${d.value} ${d.unit}. Tap for detail.">
+    return `<button class="indcard ${d.family === "ice" ? "ice" : "heat"}" data-i="${i}" data-source-id="${d.src}" aria-label="${d.name}, ${d.value} ${d.unit}. Tap for source and method.">
       <div class="indcard-top">
         <span class="indcard-name">${d.name}</span>
         <span class="indcard-fam fam-${d.family === "ice" ? "ice" : "heat"}"></span>
@@ -122,7 +126,7 @@ function buildCards() {
       <div class="indcard-val2">${d.value2}</div>
       ${sparkline(d.series, col)}
       <div class="indcard-cap">${d.caption}</div>
-      <div class="indcard-more">Source &amp; method →</div>
+      <div class="indcard-more">Source &amp; method · accessed ${SOURCES[d.src].d} →</div>
     </button>`;
   }).join("");
   grid.querySelectorAll(".indcard").forEach((b) =>
@@ -265,22 +269,67 @@ function animateBars(wrap) {
   }), { threshold: 0.15 });
   io.observe(wrap);
 }
+const OWN_LABEL = { investor: "Investor-owned", state: "State-owned", nation: "Nation-state" };
 function buildMajors() {
   byId("majorsBig").textContent = CARBON_MAJORS_STAT.headline;
-  byId("majorsBody").innerHTML = CARBON_MAJORS_STAT.body + ` <a href="https://carbonmajors.org/" target="_blank" rel="noopener" style="color:var(--ice)">Carbon Majors ↗</a>`;
+  byId("majorsBody").innerHTML = CARBON_MAJORS_STAT.body + ` <a href="https://carbonmajors.org/" target="_blank" rel="noopener" style="color:var(--ice)">Carbon Majors 2024 ↗</a>`;
   byId("subsidyBig").textContent = CARBON_MAJORS_STAT.subsidy;
   byId("subsidyBody").innerHTML = CARBON_MAJORS_STAT.subsidyBody + ` <a href="https://www.imf.org/en/Topics/climate-change/energy-subsidies" target="_blank" rel="noopener" style="color:var(--ice)">IMF ↗</a>`;
-  byId("majorsList").innerHTML = CARBON_MAJORS.map((m) =>
-    `<div class="major"><div class="major-name">${m.name}</div><div class="major-meta"><span class="tag ${m.type === "Investor" ? "inv" : ""}">${m.type}</span> · ${m.note}</div></div>`).join("");
+
+  const max = Math.max(...CARBON_MAJORS.map((m) => m.cum));
+  const bars = CARBON_MAJORS.map((m, i) =>
+    `<button class="maj-row" data-i="${i}" aria-label="${m.name}, ${m.cum}% of cumulative CO₂, ${OWN_LABEL[m.own]}">
+      <span class="maj-name">${m.name}</span>
+      <span class="maj-track"><span class="maj-fill ${m.own}" style="width:0" data-w="${((m.cum / max) * 100).toFixed(1)}"></span></span>
+      <span class="maj-val">${m.cum}%</span>
+    </button>`).join("");
+
+  byId("majorsList").innerHTML =
+    `<div class="majors-legend">
+      <span><i class="own-dot investor"></i>Investor-owned</span>
+      <span><i class="own-dot state"></i>State-owned company</span>
+      <span><i class="own-dot nation"></i>Nation-state production</span>
+      <span class="majors-hint">tap a producer ↓</span>
+    </div>
+    <div class="maj-axis">share of all fossil &amp; cement CO₂ since 1854</div>
+    <div class="majors-bars" id="majorsBars">${bars}</div>
+    <div class="majors-detail" id="majorsDetail" aria-live="polite">${majorDetailHTML(0)}</div>`;
+
+  const rows = byId("majorsBars");
+  rows.querySelectorAll(".maj-row").forEach((b) => {
+    const show = () => { byId("majorsDetail").innerHTML = majorDetailHTML(+b.dataset.i);
+      rows.querySelectorAll(".maj-row").forEach((r) => r.classList.toggle("on", r === b)); };
+    b.addEventListener("click", show);
+    b.addEventListener("mouseenter", show);
+    b.addEventListener("focus", show);
+  });
+  const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { rows.querySelectorAll(".maj-fill").forEach((f) => f.style.width = f.dataset.w + "%"); io.disconnect(); } }), { threshold: 0.1 });
+  io.observe(rows);
+}
+function majorDetailHTML(i) {
+  const m = CARBON_MAJORS[i];
+  return `<div class="md-name">${m.name}</div>
+    <div class="md-tags"><span class="own-badge ${m.own}">${OWN_LABEL[m.own]}</span><span class="md-hq">${m.hq}</span></div>
+    <div class="md-stats">
+      <span><b>${m.cum}%</b> of all CO₂ since 1854</span>
+      ${m.y2024 ? `<span><b>${m.y2024}%</b> of 2024 emissions</span>` : ""}
+      ${m.rev ? `<span><b>${m.rev}</b> · 2024 revenue</span>` : ""}
+    </div>
+    <div class="md-leader">${m.leader}</div>
+    <div class="md-src">Source: <a href="https://carbonmajors.org/" target="_blank" rel="noopener">InfluenceMap · Carbon Majors 2024 ↗</a> · CEOs verified Jun 2026</div>`;
 }
 function buildTimeline() {
   byId("timeline").innerHTML = POLICY_TIMELINE.map((e) =>
-    `<div class="tl-item ${e.kind}"><div class="tl-year">${e.year}</div><div class="tl-title">${e.title}</div><div class="tl-body">${e.body}</div></div>`).join("");
-  byId("lobbyNote").innerHTML = LOBBY_NOTE + ` Sources: <a href="https://influencemap.org/" target="_blank" rel="noopener">InfluenceMap ↗</a>, <a href="https://www.opensecrets.org/" target="_blank" rel="noopener">OpenSecrets ↗</a>.`;
-  byId("newsFeed").innerHTML = NEWS_FEED.map((n) => {
-    const s = SOURCES[n.src];
-    return `<div class="news-item"><span class="news-outlet">${n.outlet}</span><a class="news-head" href="${s.url}" target="_blank" rel="noopener" style="color:var(--text)">${n.head}</a><span class="news-date">${n.date}</span></div>`;
-  }).join("");
+    `<div class="tl-item ${e.kind}">
+       <div class="tl-year">${e.year}</div>
+       <div class="tl-title">${e.title}</div>
+       <div class="tl-body">${e.body}</div>
+       ${e.lobby ? `<div class="tl-lobby"><span class="tl-lobby-tag">Lobbying</span>${e.lobby}</div>` : ""}
+     </div>`).join("");
+  byId("lobbyNote").innerHTML = LOBBY_NOTE + ` <a href="https://www.opensecrets.org/industries/indus.php?ind=E01" target="_blank" rel="noopener">OpenSecrets ↗</a> · <a href="https://influencemap.org/" target="_blank" rel="noopener">InfluenceMap ↗</a> · <a href="https://kickbigpollutersout.org/" target="_blank" rel="noopener">Kick Big Polluters Out ↗</a>`;
+  byId("newsFeed").innerHTML = `<div class="news-head-lbl">A curated feed · high-credibility journalism &amp; primary data releases</div>` +
+    NEWS_FEED.map((n) =>
+      `<div class="news-item"><span class="news-outlet">${n.outlet}</span><a class="news-head" href="${n.url}" target="_blank" rel="noopener" style="color:var(--text)">${n.head}</a><span class="news-date">${n.date}</span></div>`).join("");
 }
 
 /* ═══ CHAPTER 04 · FORECAST EXPLORER ═══ */
@@ -349,12 +398,20 @@ function buildCompare() {
 /* ═══ CODA · STEP 01 · PRIORITIES (select = rank) ═══ */
 function buildPriorities() {
   const grid = byId("prioGrid");
-  grid.innerHTML = PRIORITIES.map((p, i) =>
-    `<button class="prio-card" data-i="${i}" aria-pressed="false">
+  grid.innerHTML = PRIORITIES.map((p, i) => {
+    const s = SOURCES[p.src];
+    return `<div class="prio-card" data-i="${i}" role="button" tabindex="0" aria-pressed="false">
       <span class="prio-rank">${i + 1}</span>
-      <span><span class="prio-name">${p.name}</span><span class="prio-desc">${p.desc}</span></span>
-    </button>`).join("");
-  grid.querySelectorAll(".prio-card").forEach((b) => b.addEventListener("click", () => togglePriority(+b.dataset.i)));
+      <span class="prio-body"><span class="prio-name">${p.name}</span><span class="prio-desc">${p.desc}</span>
+        <a class="prio-src" href="${s.url}" target="_blank" rel="noopener">${s.label.split(" · ")[0]} ↗</a></span>
+    </div>`;
+  }).join("");
+  grid.querySelectorAll(".prio-card").forEach((b) => {
+    b.addEventListener("click", (e) => { if (!e.target.closest(".prio-src")) togglePriority(+b.dataset.i); });
+    b.addEventListener("keydown", (e) => {
+      if ((e.key === "Enter" || e.key === " ") && !e.target.closest(".prio-src")) { e.preventDefault(); togglePriority(+b.dataset.i); }
+    });
+  });
 }
 function togglePriority(i) {
   const at = ranking.indexOf(i);
@@ -475,6 +532,7 @@ ${country}`;
   if (contact) contact.innerHTML = countryDone && selectedCountry[4]
     ? `When you're ready, here is the official contact route for ${selectedCountry[0]}: <a href="${selectedCountry[4]}" target="_blank" rel="noopener">${selectedCountry[4]} ↗</a>`
     : "";
+  saveState(); // persist the journey (P1-8); guarded during restore
 }
 window.copyLetter = function () {
   const out = byId("letterOutput");
@@ -541,7 +599,6 @@ function buildGlobalPriorities() {
       const p = PRIORITIES[x.i], col = p.color === "ice" ? "var(--ice)" : "var(--ember)";
       return `<div class="gp-row"><div class="gp-name">${p.name}</div><div class="gp-track"><div class="gp-fill" style="background:${col};width:0" data-w="${((x.w / max) * 100).toFixed(0)}"></div></div><div class="gp-pct">${((x.w / max) * 100).toFixed(0)}%</div></div>`;
     }).join("");
-  animateBars(wrap.querySelector(".gp-row") ? { querySelectorAll: (s) => wrap.querySelectorAll(".gp-fill") } : wrap);
   const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { wrap.querySelectorAll(".gp-fill").forEach((b) => b.style.width = b.dataset.w + "%"); io.disconnect(); } }), { threshold: 0.15 });
   io.observe(wrap);
 }
@@ -735,6 +792,57 @@ function initGlobeLazy() {
 }
 window.onMadHydrated = function () { renderCoalitionCount(); buildGlobalPriorities(); refreshGlobe(); };
 
+/* ═══ STATE PERSISTENCE (P1-8) ═══
+   Everything the reader builds — ranked priorities, country, letter draft,
+   hazard radius, local forecast location — survives a refresh. Stored ONLY in
+   this browser's localStorage; never sent to any backend. */
+function saveState() {
+  if (!hydrated || restoringState) return;
+  try {
+    localStorage.setItem(STATE_KEY, JSON.stringify({
+      priorityOrder: ranking,
+      country: selectedCountry ? selectedCountry[0] : null,
+      letterName: byId("letterName")?.value || "",
+      letterLeader: byId("letterLeader")?.value || "",
+      letterDraft: letterEdited ? (byId("letterOutput")?.innerText || "") : null,
+      radius: window.__madRadius || 250,
+      localForecastLocation: window.__madForecastLoc || null,
+      lastUpdated: Date.now(),
+    }));
+  } catch (e) {}
+}
+window.saveState = saveState; // let hazard.js persist radius changes
+function loadState() {
+  let s;
+  try { s = JSON.parse(localStorage.getItem(STATE_KEY) || "null"); } catch (e) { return; }
+  if (!s) return;
+  restoringState = true;
+  if (Array.isArray(s.priorityOrder)) ranking = s.priorityOrder.filter((i) => i >= 0 && i < PRIORITIES.length);
+  if (s.letterName && byId("letterName")) byId("letterName").value = s.letterName;
+  if (s.letterLeader && byId("letterLeader")) byId("letterLeader").value = s.letterLeader;
+  renderPriorities();
+  if (s.country) { const sel = byId("countrySelect"); if (sel) { sel.value = s.country; window.showCountry(s.country); } }
+  if (s.radius && typeof window.setRadius === "function") { window.__madRadius = s.radius; window.setRadius(s.radius); }
+  if (s.localForecastLocation) window.__madForecastLoc = s.localForecastLocation;
+  if (s.letterDraft) {
+    letterEdited = true;
+    const o = byId("letterOutput");
+    if (o) { o.innerHTML = s.letterDraft.replace(/\n/g, "<br>"); o.dataset.plain = s.letterDraft; }
+    if (byId("letterNote")) byId("letterNote").classList.remove("show");
+  }
+  restoringState = false;
+}
+window.clearMadState = function () {
+  try { localStorage.removeItem(STATE_KEY); } catch (e) {}
+  ranking = []; selectedCountry = null; letterEdited = false;
+  const sel = byId("countrySelect"); if (sel) sel.value = "";
+  byId("countryCard")?.classList.remove("show");
+  if (byId("letterName")) byId("letterName").value = "";
+  if (byId("letterLeader")) byId("letterLeader").value = "";
+  renderPriorities();
+  const btn = byId("clearStateBtn"); if (btn) { const o = btn.textContent; btn.textContent = "✓ Cleared"; setTimeout(() => (btn.textContent = o), 1800); }
+};
+
 /* ═══ INIT ═══ */
 function init() {
   initBg();
@@ -749,6 +857,10 @@ function init() {
   buildPriorities(); renderPriorities();
   buildCountrySelect();
   renderCoalitionCount(); buildGlobalPriorities(); initGlobeLazy();
+  // letter hand-edits mark the draft dirty so it persists across refresh
+  byId("letterOutput")?.addEventListener("input", () => { letterEdited = true; saveState(); });
+  loadState(); // restore any saved journey last, once the DOM is built
+  hydrated = true; // now enable persistence for real user actions (P1-8)
 }
 if (document.readyState !== "loading") init();
 else document.addEventListener("DOMContentLoaded", init);
