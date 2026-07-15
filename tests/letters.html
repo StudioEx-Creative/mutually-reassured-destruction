@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Letter fixtures · Mutually Reassured Destruction</title>
+    <style>
+      body { background: #06080a; color: #e9ecef; font-family: system-ui, sans-serif; max-width: 900px; margin: 0 auto; padding: 3rem 1.5rem; line-height: 1.5; }
+      h1 { font-size: 1.5rem; } .note { color: #8593a0; font-size: .85rem; margin-bottom: 2rem; }
+      .row { border: 1px solid #20272f; border-radius: 8px; padding: 1rem 1.2rem; margin-bottom: .8rem; }
+      .co { font-weight: 600; color: #6ec7e8; }
+      .sal { font-family: Georgia, serif; font-size: 1.05rem; margin: .3rem 0; }
+      .meta { color: #8593a0; font-size: .82rem; }
+      .warn { color: #ff6b35; }
+      a { color: #6ec7e8; }
+    </style>
+  </head>
+  <body>
+    <h1>Letter fixtures — salutation QA (P1-7)</h1>
+    <p class="note">
+      Renders the auto-generated salutation and the country line for every country in
+      <code>COUNTRIES</code>, using the same office titles the live letter uses. Eyeball these
+      for grammar and correctness. Head-of-state <em>names</em> are intentionally not hard-coded
+      (they go stale); the reader supplies the name, or the letter falls back to the office title
+      below. Verify the office titles on build day and expand the list toward the full
+      G20 + EU27 + 20-most-populous set before a press push.
+    </p>
+    <div id="out"></div>
+    <script src="../js/data.js"></script>
+    <script>
+      const withArticle = (c) => (/^United |^Netherlands$/.test(c) ? "the " + c : c);
+      const out = document.getElementById("out");
+      let issues = 0;
+      out.innerHTML = COUNTRIES.map((c) => {
+        const [name, iso, rating, perCap, contact, office] = c;
+        const salut = "Dear " + (office || "Head of Government") + ",";
+        const line = `${name} emits about ${perCap} tonnes of CO₂ per person each year, and its current climate plan is rated "${rating}" against the 1.5 °C pathway.`;
+        const missing = !office ? ' <span class="warn">⚠ no office title</span>' : "";
+        if (!office) issues++;
+        const badContact = !/^https?:\/\//.test(contact) ? ' <span class="warn">⚠ contact URL</span>' : "";
+        return `<div class="row">
+          <div class="co">${name} · ${iso}${missing}${badContact}</div>
+          <div class="sal">${salut}</div>
+          <div class="meta">${line}</div>
+          <div class="meta">Contact: <a href="${contact}" target="_blank" rel="noopener">${contact}</a></div>
+        </div>`;
+      }).join("");
+      document.title = `Letter fixtures · ${COUNTRIES.length} countries · ${issues} issues`;
+    </script>
+  </body>
+</html>

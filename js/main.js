@@ -382,17 +382,90 @@ function renderCard(id, s) {
   requestAnimationFrame(() => requestAnimationFrame(() => { water.style.height = fill + "%"; }));
 }
 function buildCompare() {
-  const head = `<div class="fcmp-row head"><div>Impact</div><div>1.5 °C Aligned</div><div>Pledges</div><div>High-emission</div></div>`;
-  const rows = FORECAST_IMPACTS.map((r) => {
-    const s = SOURCES[r.src];
-    return `<div class="fcmp-row">
+  const a = scenarioById(cmp[0]), b = scenarioById(cmp[1]);
+  const cls = (s) => (s.color === "ice" ? "v-ice" : "v-ember");
+  const head = `<div class="fcmp-row head fcmp3"><div>Endpoint impact</div><div class="${cls(a)}">${a.name}</div><div class="${cls(b)}">${b.name}</div></div>`;
+  const rows = FORECAST_IMPACTS.map((r) =>
+    `<div class="fcmp-row fcmp3">
       <div class="k" data-k="Impact">${r.k}</div>
-      <div class="v-ice" data-k="1.5 °C Aligned">${r.aligned}</div>
-      <div data-k="Pledges">${r.pledges}</div>
-      <div class="v-ember" data-k="High-emission">${r.worst}</div>
-    </div>`;
-  }).join("");
-  byId("forecastCompare").innerHTML = head + rows;
+      <div class="${cls(a)}" data-k="${a.name}">${r.byPath[cmp[0]]}</div>
+      <div class="${cls(b)}" data-k="${b.name}">${r.byPath[cmp[1]]}</div>
+    </div>`).join("");
+  byId("forecastCompare").innerHTML = head + rows +
+    `<div class="fcmp-src">By pathway at 2100 / mid-century (not per horizon). Sources: <a href="https://www.ipcc.ch/report/ar6/syr/" target="_blank" rel="noopener">IPCC AR6</a> · <a href="https://www.worldbank.org/en/news/feature/2021/09/13/millions-on-the-move-in-their-own-countries-the-human-face-of-climate-change" target="_blank" rel="noopener">World Bank Groundswell</a>.</div>`;
+}
+
+/* ═══ P1-5 · LOCALISE THE FORECAST (Open-Meteo downscaled CMIP6) ═══
+   Opt-in. Coordinates query only the projection API. Falls back to the
+   selected country's pathway when local data is unavailable. */
+function flStatus(m) { const el = byId("flStatus"); if (el) el.textContent = m; }
+window.localiseForecast = function () {
+  if (!navigator.geolocation) { flStatus("Geolocation isn't available — type a place instead."); return; }
+  flStatus("Asking your browser for permission…");
+  navigator.geolocation.getCurrentPosition(
+    (p) => runLocalForecast(p.coords.latitude, p.coords.longitude),
+    (e) => flStatus(e.code === 1 ? "Permission declined — type a place instead." : "Couldn't get your location — type a place."),
+    { timeout: 10000, maximumAge: 600000 });
+};
+async function flReverseGeocode(lat, lng) {
+  try {
+    const j = await (await fetch(`https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lng}&localityLanguage=en`)).json();
+    return [j.city || j.locality, j.countryCode].filter(Boolean).join(", ") || "your area";
+  } catch (_) { return "your area"; }
+}
+async function runLocalForecast(lat, lng, label) {
+  flStatus("Loading your area's climate projection…");
+  window.__madForecastLoc = { lat, lng, label: label || null };
+  saveState();
+  try {
+    if (!label) label = await flReverseGeocode(lat, lng);
+    const url = `https://climate-api.open-meteo.com/v1/climate?latitude=${lat}&longitude=${lng}` +
+      `&start_date=2000-01-01&end_date=2049-12-31&models=MRI_AGCM3_2_S&daily=temperature_2m_mean,temperature_2m_max&temperature_unit=celsius`;
+    const j = await (await fetch(url)).json();
+    const t = j.daily.time, mean = j.daily.temperature_2m_mean, mx = j.daily.temperature_2m_max;
+    const yr = {}; // year → {sum,n,hot}
+    for (let i = 0; i < t.length; i++) {
+      const y = +t[i].slice(0, 4);
+      const o = (yr[y] = yr[y] || { sum: 0, n: 0, hot: 0 });
+      if (mean[i] != null) { o.sum += mean[i]; o.n++; }
+      if (mx[i] != null && mx[i] >= 30) o.hot++;
+    }
+    const decMean = (a, b) => { let s = 0, c = 0; for (let y = a; y <= b; y++) if (yr[y] && yr[y].n) { s += yr[y].sum / yr[y].n; c++; } return c ? s / c : null; };
+    const decHot = (a, b) => { let s = 0, c = 0; for (let y = a; y <= b; y++) if (yr[y]) { s += yr[y].hot; c++; } return c ? s / c : null; };
+    const m2000 = decMean(2000, 2009), m2040 = decMean(2040, 2049);
+    const h2010 = decHot(2010, 2019), h2040 = decHot(2040, 2049);
+    if (m2000 == null || m2040 == null) throw new Error("insufficient data");
+    const warming = m2040 - m2000;
+    byId("flResult").innerHTML = `
+      <div class="fl-place">${label}</div>
+      <div class="fl-grid">
+        <div class="fl-stat"><div class="fl-v ember">+${warming.toFixed(1)} °C</div><div class="fl-k">annual mean warming, 2000s → 2040s</div></div>
+        <div class="fl-stat"><div class="fl-v">${m2000.toFixed(1)} → ${m2040.toFixed(1)} °C</div><div class="fl-k">local average temperature</div></div>
+        ${h2010 != null && h2040 != null ? `<div class="fl-stat"><div class="fl-v ember">${Math.round(h2010)} → ${Math.round(h2040)}</div><div class="fl-k">days above 30 °C per year</div></div>` : ""}
+      </div>
+      <div class="fl-src">Downscaled CMIP6 (MRI-AGCM3-2-S, high-emission), via <a href="https://open-meteo.com/en/docs/climate-api" target="_blank" rel="noopener">Open-Meteo Climate API ↗</a>. One model shown; the direction, not the decimal, is the point.</div>`;
+    byId("flResult").classList.add("show");
+    flStatus("");
+  } catch (e) {
+    byId("flResult").classList.remove("show");
+    flStatus(selectedCountry
+      ? `Couldn't load a local projection here. Your country, ${selectedCountry[0]}, is rated "${selectedCountry[2]}" against the 1.5 °C pathway (Climate Action Tracker).`
+      : "Couldn't load a local projection. Try again, or pick your country below.");
+  }
+}
+function initLocalForecastSearch() {
+  const inp = byId("flSearch");
+  if (!inp) return;
+  inp.addEventListener("keydown", async (e) => {
+    if (e.key !== "Enter") return;
+    const q = inp.value.trim(); if (!q) return;
+    flStatus("Looking up '" + q + "'…");
+    try {
+      const r = await (await fetch("https://geocoding-api.open-meteo.com/v1/search?count=1&language=en&format=json&name=" + encodeURIComponent(q))).json();
+      if (r.results && r.results[0]) { const g = r.results[0]; runLocalForecast(g.latitude, g.longitude, [g.name, g.country_code].filter(Boolean).join(", ")); }
+      else flStatus("Couldn't find '" + q + "'. Try a larger town or city.");
+    } catch (_) { flStatus("Place lookup failed — check your connection."); }
+  });
 }
 
 /* ═══ CODA · STEP 01 · PRIORITIES (select = rank) ═══ */
@@ -489,12 +562,14 @@ function generateLetter() {
   if (note) note.classList.toggle("show", !(rankDone && countryDone));
 
   const RED = (t) => `<span class="letter-redfill">${t}</span>`;
-  // some country names take a definite article ("the United Kingdom")
-  const withArticle = (c) => (/^United |^Netherlands$|^Czech|^Philippines$/.test(c) ? "the " + c : c);
   const name = (byId("letterName")?.value || "").trim() || "A concerned citizen";
   const leaderRaw = (byId("letterLeader")?.value || "").trim();
   const country = countryDone ? selectedCountry[0] : RED("[your country]");
-  const leader = leaderRaw || (countryDone ? `Head of Government of ${withArticle(selectedCountry[0])}` : RED("[your head of state]"));
+  // per-country office (President / Prime Minister / Chancellor / King) — the
+  // stable institution, so no head-of-state NAME can go stale. If the reader
+  // types a specific name it takes precedence.
+  const office = countryDone ? (selectedCountry[5] || "Head of Government") : null;
+  const leader = leaderRaw || (countryDone ? office : RED("[your head of state]"));
   const perCapLine = countryDone
     ? `${selectedCountry[0]} emits about ${selectedCountry[3]} tonnes of CO₂ per person each year, and its current climate plan is rated "${selectedCountry[2]}" against the 1.5 °C pathway.`
     : RED("[Pick your country below to show its emissions and its 1.5 °C alignment.]");
@@ -859,8 +934,12 @@ function init() {
   renderCoalitionCount(); buildGlobalPriorities(); initGlobeLazy();
   // letter hand-edits mark the draft dirty so it persists across refresh
   byId("letterOutput")?.addEventListener("input", () => { letterEdited = true; saveState(); });
+  initLocalForecastSearch();
   loadState(); // restore any saved journey last, once the DOM is built
   hydrated = true; // now enable persistence for real user actions (P1-8)
+  // repopulate a saved local forecast (a stored coordinate, no new geolocation)
+  const fl = window.__madForecastLoc;
+  if (fl && fl.lat != null) runLocalForecast(fl.lat, fl.lng, fl.label);
 }
 if (document.readyState !== "loading") init();
 else document.addEventListener("DOMContentLoaded", init);

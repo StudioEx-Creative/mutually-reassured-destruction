@@ -388,12 +388,19 @@ const SCENARIOS = [
     src: "ipcc_ar6",
   },
 ];
+/* Endpoint impacts BY PATHWAY (at 2100, or mid-century where noted). Keyed by
+   scenario id so the comparison table shows whichever two pathways the reader
+   is comparing. Temperature & sea-level are shown per-horizon in the cards;
+   these endpoint impacts are only cleanly published by warming level, not per
+   intermediate year — so per the brief's rule we show them by pathway, not per
+   horizon, and omit any output we can't source across all four (e.g. a global
+   forest-cover % projection). Source: IPCC AR6; World Bank Groundswell. */
 const FORECAST_IMPACTS = [
-  { k: "Sea level rise (2100)", aligned: "0.3–0.6 m", pledges: "0.5–0.7 m", worst: "0.6–1.0 m+", src: "ipcc_ar6" },
-  { k: "Ice-free Arctic summers", aligned: "rare", pledges: "regular by 2050", worst: "routine", src: "ipcc_ar6" },
-  { k: "Coral reefs remaining", aligned: "~10–30%", pledges: "~1%", worst: "~0%", src: "ipcc_ar6" },
-  { k: "People in chronic extreme heat", aligned: "hundreds of millions", pledges: "~2 billion+", worst: "~3 billion+", src: "ipcc_ar6" },
-  { k: "People displaced by 2050", aligned: "tens of millions", pledges: "up to 216 million", worst: "200 million+", src: "groundswell" },
+  { k: "Sea-level rise by 2100 (likely)", byPath: { current: "0.6–0.8 m", pledges: "0.5–0.7 m", aligned: "0.3–0.6 m", worst: "0.6–1.0 m+" }, src: "ipcc_ar6" },
+  { k: "Ice-free Arctic summers", byPath: { current: "regular", pledges: "regular by ~2050", aligned: "rare", worst: "routine" }, src: "ipcc_ar6" },
+  { k: "Coral reefs remaining", byPath: { current: "~1%", pledges: "~1%", aligned: "~10–30%", worst: "~0%" }, src: "ipcc_ar6" },
+  { k: "People in chronic extreme heat", byPath: { current: "~2 billion+", pledges: "~2 billion+", aligned: "hundreds of millions", worst: "~3 billion+" }, src: "ipcc_ar6" },
+  { k: "People displaced by 2050 (internal)", byPath: { current: "up to 216 million", pledges: "up to 216 million", aligned: "tens of millions", worst: "200 million+" }, src: "groundswell" },
 ];
 
 /* ═══ CODA · STEP 01 · PRIORITIES ══════════════════════════════════
@@ -419,40 +426,40 @@ const PRIORITIES = [
    contact route]. CAT rates ~40 governments; others marked "not rated".
    Contact routes are official parliament/government channels. */
 const COUNTRIES = [
-  ["United States", "US", "Insufficient", 14.3, "https://www.usa.gov/elected-officials"],
-  ["China", "CN", "Highly insufficient", 8.4, "http://www.gov.cn/"],
-  ["India", "IN", "Highly insufficient", 2.1, "https://www.mygov.in/"],
-  ["United Kingdom", "GB", "Almost sufficient", 4.5, "https://www.writetothem.com/"],
-  ["Germany", "DE", "Insufficient", 7.7, "https://www.bundestag.de/en/members"],
-  ["France", "FR", "Insufficient", 4.2, "https://www.assemblee-nationale.fr/"],
-  ["Japan", "JP", "Insufficient", 8.5, "https://www.sangiin.go.jp/eng/"],
-  ["Russia", "RU", "Critically insufficient", 11.4, "http://government.ru/en/"],
-  ["Brazil", "BR", "Almost sufficient", 2.3, "https://www.gov.br/planalto/"],
-  ["Canada", "CA", "Insufficient", 14.0, "https://www.ourcommons.ca/members/en"],
-  ["Australia", "AU", "Insufficient", 14.8, "https://www.aph.gov.au/Senators_and_Members"],
-  ["Indonesia", "ID", "Insufficient", 2.6, "https://www.dpr.go.id/"],
-  ["South Africa", "ZA", "Insufficient", 6.7, "https://www.parliament.gov.za/"],
-  ["Mexico", "MX", "Critically insufficient", 3.6, "https://www.gob.mx/presidencia"],
-  ["Saudi Arabia", "SA", "Critically insufficient", 18.2, "https://www.my.gov.sa/"],
-  ["South Korea", "KR", "Highly insufficient", 11.6, "https://www.assembly.go.kr/portal/eng/"],
-  ["Turkey", "TR", "Critically insufficient", 5.3, "https://www.tbmm.gov.tr/"],
-  ["Italy", "IT", "Insufficient", 5.4, "https://www.camera.it/"],
-  ["Spain", "ES", "Insufficient", 5.1, "https://www.congreso.es/"],
-  ["Nigeria", "NG", "not rated", 0.6, "https://www.nass.gov.ng/"],
-  ["Argentina", "AR", "Insufficient", 3.7, "https://www.argentina.gob.ar/"],
-  ["Netherlands", "NL", "Insufficient", 7.3, "https://www.houseofrepresentatives.nl/"],
-  ["Poland", "PL", "Insufficient", 8.0, "https://www.sejm.gov.pl/"],
-  ["Egypt", "EG", "Highly insufficient", 2.3, "https://www.parliament.gov.eg/"],
-  ["Pakistan", "PK", "not rated", 0.9, "https://www.na.gov.pk/"],
-  ["Bangladesh", "BD", "not rated", 0.6, "https://www.parliament.gov.bd/"],
-  ["Vietnam", "VN", "Critically insufficient", 3.5, "https://quochoi.vn/"],
-  ["Sweden", "SE", "Insufficient", 3.6, "https://www.riksdagen.se/en/"],
-  ["Norway", "NO", "Insufficient", 6.9, "https://www.stortinget.no/en/"],
-  ["Kenya", "KE", "Almost sufficient", 0.4, "https://www.parliament.go.ke/"],
-  ["Ethiopia", "ET", "Almost sufficient", 0.2, "https://www.hopr.gov.et/"],
-  ["United Arab Emirates", "AE", "Insufficient", 20.5, "https://www.government.ae/"],
-  ["New Zealand", "NZ", "Highly insufficient", 6.3, "https://www.parliament.nz/en/mps-and-electorates/members-of-parliament/"],
-  ["Switzerland", "CH", "Insufficient", 4.0, "https://www.parlament.ch/en"],
+  ["United States", "US", "Insufficient", 14.3, "https://www.usa.gov/elected-officials", "President"],
+  ["China", "CN", "Highly insufficient", 8.4, "http://www.gov.cn/", "President"],
+  ["India", "IN", "Highly insufficient", 2.1, "https://www.mygov.in/", "Prime Minister"],
+  ["United Kingdom", "GB", "Almost sufficient", 4.5, "https://www.writetothem.com/", "Prime Minister"],
+  ["Germany", "DE", "Insufficient", 7.7, "https://www.bundestag.de/en/members", "Chancellor"],
+  ["France", "FR", "Insufficient", 4.2, "https://www.assemblee-nationale.fr/", "President"],
+  ["Japan", "JP", "Insufficient", 8.5, "https://www.sangiin.go.jp/eng/", "Prime Minister"],
+  ["Russia", "RU", "Critically insufficient", 11.4, "http://government.ru/en/", "President"],
+  ["Brazil", "BR", "Almost sufficient", 2.3, "https://www.gov.br/planalto/", "President"],
+  ["Canada", "CA", "Insufficient", 14.0, "https://www.ourcommons.ca/members/en", "Prime Minister"],
+  ["Australia", "AU", "Insufficient", 14.8, "https://www.aph.gov.au/Senators_and_Members", "Prime Minister"],
+  ["Indonesia", "ID", "Insufficient", 2.6, "https://www.dpr.go.id/", "President"],
+  ["South Africa", "ZA", "Insufficient", 6.7, "https://www.parliament.gov.za/", "President"],
+  ["Mexico", "MX", "Critically insufficient", 3.6, "https://www.gob.mx/presidencia", "President"],
+  ["Saudi Arabia", "SA", "Critically insufficient", 18.2, "https://www.my.gov.sa/", "King"],
+  ["South Korea", "KR", "Highly insufficient", 11.6, "https://www.assembly.go.kr/portal/eng/", "President"],
+  ["Turkey", "TR", "Critically insufficient", 5.3, "https://www.tbmm.gov.tr/", "President"],
+  ["Italy", "IT", "Insufficient", 5.4, "https://www.camera.it/", "Prime Minister"],
+  ["Spain", "ES", "Insufficient", 5.1, "https://www.congreso.es/", "Prime Minister"],
+  ["Nigeria", "NG", "not rated", 0.6, "https://www.nass.gov.ng/", "President"],
+  ["Argentina", "AR", "Insufficient", 3.7, "https://www.argentina.gob.ar/", "President"],
+  ["Netherlands", "NL", "Insufficient", 7.3, "https://www.houseofrepresentatives.nl/", "Prime Minister"],
+  ["Poland", "PL", "Insufficient", 8.0, "https://www.sejm.gov.pl/", "Prime Minister"],
+  ["Egypt", "EG", "Highly insufficient", 2.3, "https://www.parliament.gov.eg/", "President"],
+  ["Pakistan", "PK", "not rated", 0.9, "https://www.na.gov.pk/", "Prime Minister"],
+  ["Bangladesh", "BD", "not rated", 0.6, "https://www.parliament.gov.bd/", "Head of Government"],
+  ["Vietnam", "VN", "Critically insufficient", 3.5, "https://quochoi.vn/", "Prime Minister"],
+  ["Sweden", "SE", "Insufficient", 3.6, "https://www.riksdagen.se/en/", "Prime Minister"],
+  ["Norway", "NO", "Insufficient", 6.9, "https://www.stortinget.no/en/", "Prime Minister"],
+  ["Kenya", "KE", "Almost sufficient", 0.4, "https://www.parliament.go.ke/", "President"],
+  ["Ethiopia", "ET", "Almost sufficient", 0.2, "https://www.hopr.gov.et/", "Prime Minister"],
+  ["United Arab Emirates", "AE", "Insufficient", 20.5, "https://www.government.ae/", "President"],
+  ["New Zealand", "NZ", "Highly insufficient", 6.3, "https://www.parliament.nz/en/mps-and-electorates/members-of-parliament/", "Prime Minister"],
+  ["Switzerland", "CH", "Insufficient", 4.0, "https://www.parlament.ch/en", "President"],
 ];
 
 /* Globe coordinates [lat, lng] for the coalition globe (Coda step 04). */
