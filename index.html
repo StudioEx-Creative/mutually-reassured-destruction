@@ -19,7 +19,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..600&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="css/style.css?v=2026r22" />
+    <link rel="stylesheet" href="css/style.css?v=2026r26" />
   </head>
   <body>
     <a class="skip-link" href="#record">Skip to the content</a>
@@ -106,11 +106,24 @@
 
           <div class="card-grid rv rv-d2" id="cardGrid"></div>
 
-          <!-- heat stripes -->
+          <!-- ═══ THE RECORD, IN RINGS → UNROLLED INTO STRIPES ═══
+               The planet's books ARE tree rings — dendroclimatology is how the
+               record is known before thermometers. So the temperature series is
+               drawn as growth rings (1850 at the pith, 2025 at the bark) and
+               scroll unrolls them into Hawkins' stripes. Same numbers, two
+               readings. Under reduced motion this is hidden and the static
+               stripes below are shown instead. -->
           <div class="stripes-block rv">
             <div class="stripes-head">
-              <div class="stripes-h">The warming stripes · global temperature, 1850–2025</div>
+              <div class="stripes-h">The record, in rings · global temperature, 1850–2025</div>
               <button class="cvd-toggle" id="cvdToggle" aria-pressed="false" onclick="toggleStripePalette()">High-contrast palette</button>
+            </div>
+            <div class="rr-scene" id="ringScene">
+              <div class="rr-sticky">
+                <canvas id="ringCanvas" role="img"
+                  aria-label="The global temperature record 1850 to 2025 drawn as a tree's growth rings, one ring per year, which unroll into the warming stripes"
+                  aria-describedby="stripesDesc"></canvas>
+              </div>
             </div>
             <div class="stripes" id="stripes" role="img" aria-label="Warming stripes: global temperature by year, 1850 to 2025" aria-describedby="stripesDesc"></div>
             <div class="stripes-axis"><span>1850</span><span>1920</span><span>1970</span><span>2025</span></div>
@@ -573,13 +586,14 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/config.js?v=2026r22" defer></script>
-    <script src="js/data.js?v=2026r22" defer></script>
-    <script src="js/backend.js?v=2026r22" defer></script>
-    <script src="js/hazard.js?v=2026r22" defer></script>
-    <script src="js/map.js?v=2026r22" defer></script>
-    <script src="js/livingworld.js?v=2026r22" defer></script>
-    <script src="js/cutscene.js?v=2026r22" defer></script>
-    <script src="js/main.js?v=2026r22" defer></script>
+    <script src="js/config.js?v=2026r26" defer></script>
+    <script src="js/data.js?v=2026r26" defer></script>
+    <script src="js/backend.js?v=2026r26" defer></script>
+    <script src="js/hazard.js?v=2026r26" defer></script>
+    <script src="js/map.js?v=2026r26" defer></script>
+    <script src="js/livingworld.js?v=2026r26" defer></script>
+    <script src="js/cutscene.js?v=2026r26" defer></script>
+    <script src="js/recordrings.js?v=2026r26" defer></script>
+    <script src="js/main.js?v=2026r26" defer></script>
   </body>
 </html>

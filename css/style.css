@@ -685,3 +685,17 @@ footer a { color: var(--faint); }
   .cut-copy { position: static; padding: 1.5rem; display: flex; flex-direction: column; gap: .6rem; }
   .cut-line { position: static; transform: none; opacity: 1; width: auto; font-size: 1.2rem; }
 }
+
+/* ═══ CH01 · THE RECORD, IN RINGS → UNROLLED ═══
+   Pinned scrub inside the stripes block. The canvas is the primary reading;
+   the static DOM stripes below are the reduced-motion / fallback reading. */
+.rr-scene { position: relative; height: 260vh; margin: .4rem 0 1rem; }  /* TUNE: unroll length */
+.rr-sticky { position: sticky; top: 0; height: 100svh; display: block; }
+#ringCanvas { width: 100%; height: 100%; display: block; }
+/* the canvas is authoritative under normal motion — hide the duplicate stripes */
+.stripes-block .stripes, .stripes-block .stripes-axis { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .rr-scene { display: none; }
+  .stripes-block .stripes { display: flex; }
+  .stripes-block .stripes-axis { display: flex; }
+}

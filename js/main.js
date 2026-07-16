@@ -204,6 +204,7 @@ window.toggleStripePalette = function () {
   const b = byId("cvdToggle");
   if (b) { b.setAttribute("aria-pressed", String(stripesCVD)); b.classList.toggle("on", stripesCVD); b.textContent = stripesCVD ? "Brand palette" : "High-contrast palette"; }
   buildStripes();
+  if (typeof window.__recordRedraw === "function") window.__recordRedraw(); // the rings share the palette
 };
 
 /* ═══ P2-1 · FOREST-COVER RIBBON ═══ */
