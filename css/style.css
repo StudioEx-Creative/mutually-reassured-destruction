@@ -644,3 +644,17 @@ footer a { color: var(--faint); }
 .pg-caveat, .pg-lesson { font-size: .84rem; color: var(--muted); line-height: 1.55; margin-top: .7rem; font-style: italic; }
 .pg-src { font-family: var(--fm); font-size: .58rem; margin-top: .8rem; } .pg-src a { color: var(--faint); }
 @media (max-width: 640px) { .pg-grid { grid-template-columns: 1fr; gap: 1.6rem; } .ice-counter-grid { gap: 1rem; } }
+
+/* ═══ SCENE 01 · THE LIVING WORLD (scroll redesign) ═══
+   Generative ring/contour field behind the hero. A scrim keeps type at
+   WCAG contrast over it (brief: never let texture bury legibility). */
+#lw { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+/* Scrim: darkest BEHIND the type (centre) for WCAG contrast, clearing toward
+   the edges so the living ring field reads around the frame. TUNE the centre
+   stop if type contrast ever gets marginal. */
+.hero::before {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(ellipse 62% 55% at 50% 46%, rgba(6,8,10,.88) 0%, rgba(6,8,10,.66) 42%, rgba(6,8,10,.18) 100%);
+}
+.hero-logo { z-index: 2; }
+.hero-eyebrow, .hero-title, .hero-sub, .hero .ticker, .hero .scroll-cue { position: relative; z-index: 2; }
