@@ -179,3 +179,53 @@
   requestAnimationFrame(size);
   window.addEventListener("load", size);
 })();
+
+/* ═══════════════════════════════════════════════════════════════════
+   TRANSITION 01→02 · WHAT THE MACHINE LEAVES
+   Pinned scene, scroll-scrubbed. Three duotone plates hand over as the
+   reader descends: the cut, the horizon, what was living in it. Heat
+   bleeds in; a survey rule wipes across; then the map takes over.
+   prefers-reduced-motion: CSS unpins it into a static stack (see style.css)
+   and this scrubber stays out of the way.
+   TUNE: BEAT boundaries below.
+   ═══════════════════════════════════════════════════════════════════ */
+(function () {
+  "use strict";
+  const scene = document.getElementById("cutScene");
+  if (!scene) return;
+  if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+  const plates = [...scene.querySelectorAll(".cut-plate")];
+  const lines = [...scene.querySelectorAll(".cut-line")];
+  const heat = document.getElementById("cutHeat");
+  const rule = document.getElementById("cutRule");
+  const BEATS = [0.10, 0.42, 0.74];   // TUNE: where each plate/line takes over
+
+  let ticking = false;
+  function update() {
+    ticking = false;
+    const r = scene.getBoundingClientRect();
+    const total = scene.offsetHeight - window.innerHeight;
+    const p = Math.min(1, Math.max(0, -r.top / (total || 1))); // 0..1 through the scene
+
+    // which beat are we in
+    let active = 0;
+    for (let i = 0; i < BEATS.length; i++) if (p >= BEATS[i]) active = i;
+
+    plates.forEach((el, i) => {
+      const on = i === active;
+      el.style.opacity = on ? 1 : 0;
+      // slow push-in gives the stills life without a video budget
+      const img = el.querySelector("img");
+      if (img) img.style.transform = `scale(${1.06 + (on ? p * 0.10 : 0)})`;
+    });
+    lines.forEach((el, i) => el.classList.toggle("on", i === active));
+
+    if (heat) heat.style.opacity = String(Math.min(0.85, Math.max(0, (p - 0.25) * 1.6))); // TUNE
+    if (rule) rule.style.width = (p * 100).toFixed(1) + "%";
+  }
+  function onScroll() { if (!ticking) { ticking = true; requestAnimationFrame(update); } }
+  window.addEventListener("scroll", onScroll, { passive: true });
+  window.addEventListener("resize", onScroll, { passive: true });
+  update();
+})();
