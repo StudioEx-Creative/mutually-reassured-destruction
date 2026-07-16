@@ -659,60 +659,29 @@ footer a { color: var(--faint); }
 .hero-logo { z-index: 2; }
 .hero-eyebrow, .hero-title, .hero-sub, .hero .ticker, .hero .scroll-cue { position: relative; z-index: 2; }
 
-/* ═══ TRANSITION 01→02 · WHAT THE MACHINE LEAVES ═══
-   A pinned scene: three duotone plates cross-fade under scroll while heat
-   bleeds in and a survey rule wipes across — handing off to the map beneath.
-   Duotone (grayscale→sepia→hue-rotate) pulls photography into the board's
-   green world so photo, data and map share one atmosphere.
-   TUNE: --cut-heat opacity ceiling, plate scale, rule speed. */
-.cut-scene { position: relative; height: 300vh; z-index: 2; }   /* TUNE: scroll length */
-.cut-sticky {
-  position: sticky; top: 0; height: 100svh; overflow: hidden;
-  background: #10160d; display: flex; align-items: center; justify-content: center;
-}
-.cut-plates { position: absolute; inset: 0; }
-.cut-plate {
-  position: absolute; inset: 0; margin: 0; opacity: 0;
-  transition: opacity .45s linear;
-  will-change: opacity, transform;
-}
-.cut-plate img {
-  width: 100%; height: 100%; object-fit: cover; display: block;
-  /* duotone into the living-world palette */
-  filter: grayscale(1) contrast(1.15) brightness(.72) sepia(.45) hue-rotate(55deg) saturate(1.5);
-  transform: scale(1.06); will-change: transform;
-}
-.cut-plate.noimg { background: repeating-linear-gradient(135deg, #16200f, #16200f 12px, #1b2814 12px, #1b2814 24px); }
-.cut-plate.noimg img { display: none; }
-
-/* heat bleeding into the wound as the scene advances */
-.cut-heat { position: absolute; inset: 0; pointer-events: none; opacity: 0;
-  background: radial-gradient(ellipse 70% 60% at 50% 60%, rgba(255,107,53,.55), rgba(255,107,53,0) 70%);
-  mix-blend-mode: overlay; }
-/* scrim so the line always holds contrast over photography */
-.cut-sticky::after { content: ""; position: absolute; inset: 0; pointer-events: none;
-  background: linear-gradient(180deg, rgba(6,8,10,.55), rgba(6,8,10,.15) 45%, rgba(6,8,10,.8)); }
-
-.cut-copy { position: relative; z-index: 3; text-align: center; padding: 0 1.5rem; width: 100%; }
+/* ═══ TRANSITION 01→02 · THE SAME MARK AT THREE SCALES ═══
+   Generative canvas. A ring → a stump → the fishbone clear-cut from orbit.
+   No bitmaps: the zoom-out is the argument. TUNE lives in js/cutscene.js. */
+.cut-scene { position: relative; height: 320vh; z-index: 2; }   /* TUNE: scroll length */
+.cut-sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; background: #10160d; }
+#cutCanvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* scrim keeps the line at contrast over the field */
+.cut-sticky::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2;
+  background: radial-gradient(ellipse 70% 45% at 50% 50%, rgba(6,8,10,.62), rgba(6,8,10,.18) 70%); }
+.cut-copy { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
 .cut-line {
-  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) translateY(14px);
-  width: min(90vw, 22ch); margin: 0; opacity: 0;
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) translateY(12px);
+  width: min(90vw, 24ch); margin: 0; opacity: 0; text-align: center;
   font-family: var(--fd); font-style: italic; font-weight: 400;
-  font-size: clamp(1.5rem, 4.6vw, 3rem); line-height: 1.25; color: var(--text);
-  text-shadow: 0 2px 30px rgba(0,0,0,.7);
+  font-size: clamp(1.5rem, 4.4vw, 2.9rem); line-height: 1.25; color: var(--text);
+  text-shadow: 0 2px 34px rgba(0,0,0,.85);
   transition: opacity .5s var(--ease), transform .7s var(--ease);
 }
 .cut-line.on { opacity: 1; transform: translate(-50%, -50%) translateY(0); }
-/* a survey rule that wipes across — the field-document hand */
-.cut-rule { position: absolute; left: 0; bottom: 14%; height: 1px; width: 0%;
-  background: linear-gradient(90deg, transparent, rgba(239,236,229,.7), transparent); z-index: 3; }
 
 @media (prefers-reduced-motion: reduce) {
   .cut-scene { height: auto; }
-  .cut-sticky { position: static; height: auto; display: block; padding: 3rem 0; }
-  .cut-plates { position: static; display: grid; gap: 1px; }
-  .cut-plate { position: static; opacity: 1; height: 42vh; }
-  .cut-plate img { transform: none; }
-  .cut-line { position: static; transform: none; opacity: 1; margin: 1rem auto; width: auto; }
-  .cut-heat, .cut-rule { display: none; }
+  .cut-sticky { position: static; height: 62svh; }
+  .cut-copy { position: static; padding: 1.5rem; display: flex; flex-direction: column; gap: .6rem; }
+  .cut-line { position: static; transform: none; opacity: 1; width: auto; font-size: 1.2rem; }
 }

@@ -19,7 +19,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..600&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="css/style.css?v=2026r16" />
+    <link rel="stylesheet" href="css/style.css?v=2026r22" />
   </head>
   <body>
     <a class="skip-link" href="#record">Skip to the content</a>
@@ -145,31 +145,22 @@
         </div>
       </section>
 
-      <!-- ═══ TRANSITION 01→02 · WHAT THE MACHINE LEAVES ═══
-           Pinned scroll scene. Duotone plates cross-fade as the reader scrolls;
-           the tree line goes, then the horizon, then what was living in it.
-           Imagery is LOCAL-ONLY (assets/refs, gitignored) pending clearance —
-           the scene degrades to type alone if the plates are absent. -->
-      <section class="cut-scene" id="cutScene" aria-label="Transition: what the machine leaves">
+      <!-- ═══ TRANSITION 01→02 · THE SAME MARK AT THREE SCALES ═══
+           Generative, no bitmaps. The hero's rings, read close, are a stump seen
+           from above. Scroll pulls the camera back: one stump → a field of stumps
+           → the fishbone clear-cut signature seen from orbit, which IS the map.
+           The zoom-out is the argument. -->
+      <section class="cut-scene" id="cutScene" aria-label="Transition: a ring, a stump, a clear-cut seen from orbit">
         <div class="cut-sticky">
-          <div class="cut-plates" id="cutPlates">
-            <figure class="cut-plate" data-plate="0">
-              <img src="assets/refs/clearcut-forest.jpg" alt="A forest of felled trees, the ground covered in cut trunks." onerror="this.closest('.cut-plate').classList.add('noimg')" />
-            </figure>
-            <figure class="cut-plate" data-plate="1">
-              <img src="assets/refs/stumps-mountains.jpg" alt="Stumps running to the horizon in a drained valley, mountains behind." onerror="this.closest('.cut-plate').classList.add('noimg')" />
-            </figure>
-            <figure class="cut-plate" data-plate="2">
-              <img src="assets/refs/monkey-on-stump.jpg" alt="A chimpanzee curled up alone on a tree stump in a clear-cut, head bowed." onerror="this.closest('.cut-plate').classList.add('noimg')" />
-            </figure>
-          </div>
-          <div class="cut-heat" id="cutHeat" aria-hidden="true"></div>
+          <canvas id="cutCanvas" role="img"
+            aria-label="A tree's growth rings pull back to become a field of stumps, then the fishbone pattern of a clear-cut seen from orbit"
+            aria-describedby="cutDesc"></canvas>
           <div class="cut-copy">
-            <p class="cut-line" data-line="0">The machine arrives.</p>
-            <p class="cut-line" data-line="1">It does not stop at the tree line.</p>
-            <p class="cut-line" data-line="2">Something was living here.</p>
+            <p class="cut-line" data-line="0">A ring is a year.</p>
+            <p class="cut-line" data-line="1">A stump is a record, closed.</p>
+            <p class="cut-line" data-line="2">From orbit, the cut has a shape.</p>
           </div>
-          <div class="cut-rule" id="cutRule" aria-hidden="true"></div>
+          <p class="visually-hidden" id="cutDesc">A single set of concentric growth rings fills the frame — one tree, read from above, each ring a year. A cut passes through it. The view pulls back and the single stump multiplies into a field of stumps, the ground draining from green to ash. Pulling back further, the stumps resolve into the fishbone pattern of roads and side-cuts that clear-cutting leaves across the Amazon — the shape the loss makes when seen from orbit.</p>
         </div>
       </section>
 
@@ -582,12 +573,13 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/config.js?v=2026r16" defer></script>
-    <script src="js/data.js?v=2026r16" defer></script>
-    <script src="js/backend.js?v=2026r16" defer></script>
-    <script src="js/hazard.js?v=2026r16" defer></script>
-    <script src="js/map.js?v=2026r16" defer></script>
-    <script src="js/livingworld.js?v=2026r16" defer></script>
-    <script src="js/main.js?v=2026r16" defer></script>
+    <script src="js/config.js?v=2026r22" defer></script>
+    <script src="js/data.js?v=2026r22" defer></script>
+    <script src="js/backend.js?v=2026r22" defer></script>
+    <script src="js/hazard.js?v=2026r22" defer></script>
+    <script src="js/map.js?v=2026r22" defer></script>
+    <script src="js/livingworld.js?v=2026r22" defer></script>
+    <script src="js/cutscene.js?v=2026r22" defer></script>
+    <script src="js/main.js?v=2026r22" defer></script>
   </body>
 </html>
