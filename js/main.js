@@ -360,6 +360,7 @@ function buildMajors() {
       <span class="majors-hint">tap a producer ↓</span>
     </div>
     <div class="maj-axis">share of all fossil &amp; cement CO₂ since 1854</div>
+    <div class="maj-axis-note">read as a core tray · each core is what that producer pulled out of the ground</div>
     <div class="majors-bars" id="majorsBars">${bars}</div>
     <div class="majors-detail" id="majorsDetail" aria-live="polite">${majorDetailHTML(0)}</div>`;
 
