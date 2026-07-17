@@ -204,6 +204,7 @@ window.toggleStripePalette = function () {
   const b = byId("cvdToggle");
   if (b) { b.setAttribute("aria-pressed", String(stripesCVD)); b.classList.toggle("on", stripesCVD); b.textContent = stripesCVD ? "Brand palette" : "High-contrast palette"; }
   buildStripes();
+  if (typeof window.__recordRedraw === "function") window.__recordRedraw(); // the rings share the palette
 };
 
 /* ═══ P2-1 · FOREST-COVER RIBBON ═══ */
@@ -359,6 +360,7 @@ function buildMajors() {
       <span class="majors-hint">tap a producer ↓</span>
     </div>
     <div class="maj-axis">share of all fossil &amp; cement CO₂ since 1854</div>
+    <div class="maj-axis-note">read as a core tray · each core is what that producer pulled out of the ground</div>
     <div class="majors-bars" id="majorsBars">${bars}</div>
     <div class="majors-detail" id="majorsDetail" aria-live="polite">${majorDetailHTML(0)}</div>`;
 

@@ -644,3 +644,107 @@ footer a { color: var(--faint); }
 .pg-caveat, .pg-lesson { font-size: .84rem; color: var(--muted); line-height: 1.55; margin-top: .7rem; font-style: italic; }
 .pg-src { font-family: var(--fm); font-size: .58rem; margin-top: .8rem; } .pg-src a { color: var(--faint); }
 @media (max-width: 640px) { .pg-grid { grid-template-columns: 1fr; gap: 1.6rem; } .ice-counter-grid { gap: 1rem; } }
+
+/* ═══ SCENE 01 · THE LIVING WORLD (scroll redesign) ═══
+   Generative ring/contour field behind the hero. A scrim keeps type at
+   WCAG contrast over it (brief: never let texture bury legibility). */
+#lw { position: absolute; inset: 0; width: 100%; height: 100%; display: block; z-index: 0; }
+/* Scrim: darkest BEHIND the type (centre) for WCAG contrast, clearing toward
+   the edges so the living ring field reads around the frame. TUNE the centre
+   stop if type contrast ever gets marginal. */
+.hero::before {
+  content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(ellipse 62% 55% at 50% 46%, rgba(6,8,10,.88) 0%, rgba(6,8,10,.66) 42%, rgba(6,8,10,.18) 100%);
+}
+.hero-logo { z-index: 2; }
+.hero-eyebrow, .hero-title, .hero-sub, .hero .ticker, .hero .scroll-cue { position: relative; z-index: 2; }
+
+/* ═══ TRANSITION 01→02 · THE SAME MARK AT THREE SCALES ═══
+   Generative canvas. A ring → a stump → the fishbone clear-cut from orbit.
+   No bitmaps: the zoom-out is the argument. TUNE lives in js/cutscene.js. */
+.cut-scene { position: relative; height: 320vh; z-index: 2; }   /* TUNE: scroll length */
+.cut-sticky { position: sticky; top: 0; height: 100svh; overflow: hidden; background: #10160d; }
+#cutCanvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+/* scrim keeps the line at contrast over the field */
+.cut-sticky::after { content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 2;
+  background: radial-gradient(ellipse 70% 45% at 50% 50%, rgba(6,8,10,.62), rgba(6,8,10,.18) 70%); }
+.cut-copy { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+.cut-line {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%) translateY(12px);
+  width: min(90vw, 24ch); margin: 0; opacity: 0; text-align: center;
+  font-family: var(--fd); font-style: italic; font-weight: 400;
+  font-size: clamp(1.5rem, 4.4vw, 2.9rem); line-height: 1.25; color: var(--text);
+  text-shadow: 0 2px 34px rgba(0,0,0,.85);
+  transition: opacity .5s var(--ease), transform .7s var(--ease);
+}
+.cut-line.on { opacity: 1; transform: translate(-50%, -50%) translateY(0); }
+
+@media (prefers-reduced-motion: reduce) {
+  .cut-scene { height: auto; }
+  .cut-sticky { position: static; height: 62svh; }
+  .cut-copy { position: static; padding: 1.5rem; display: flex; flex-direction: column; gap: .6rem; }
+  .cut-line { position: static; transform: none; opacity: 1; width: auto; font-size: 1.2rem; }
+}
+
+/* ═══ CH01 · THE RECORD, IN RINGS → UNROLLED ═══
+   Pinned scrub inside the stripes block. The canvas is the primary reading;
+   the static DOM stripes below are the reduced-motion / fallback reading. */
+.rr-scene { position: relative; height: 260vh; margin: .4rem 0 1rem; }  /* TUNE: unroll length */
+.rr-sticky { position: sticky; top: 0; height: 100svh; display: block; }
+#ringCanvas { width: 100%; height: 100%; display: block; }
+/* the canvas is authoritative under normal motion — hide the duplicate stripes */
+.stripes-block .stripes, .stripes-block .stripes-axis { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .rr-scene { display: none; }
+  .stripes-block .stripes { display: flex; }
+  .stripes-block .stripes-axis { display: flex; }
+}
+
+/* ═══ CH01 · THE ICE CORE ═══
+   Pinned scrub: the core is raised, the CO₂ it carries traces down it.
+   Reduced motion → short, static, no scrub (the canvas draws its end state). */
+.icecore-scene { position: relative; height: 240vh; margin: 2.5rem 0 1rem; }  /* TUNE: raise length */
+.ic-sticky { position: sticky; top: 0; height: 100svh; }
+#coreCanvas { width: 100%; height: 100%; display: block; }
+@media (prefers-reduced-motion: reduce) {
+  .icecore-scene { height: 70svh; }
+  .ic-sticky { position: static; height: 70svh; }
+}
+
+/* ═══ CH03b · THE CARBON MAJORS AS DRILL CORES ═══
+   The third of the planet's books, and the only one written by us. These
+   entities didn't observe the carbon — they EXTRACTED it. So each bar is
+   drawn as the core they pulled, lying in a core tray: length = how much
+   they took. A tray is how cores are actually stored and read, which is why
+   the existing horizontal rows already had the right geometry.
+   TUNE: strata pitch (the 5px), cylinder shading alphas. */
+.maj-track {
+  height: 18px; border-radius: 2px; overflow: hidden;
+  background: linear-gradient(180deg, rgba(0,0,0,.55), rgba(255,255,255,.03));
+  border: 1px solid var(--border-2); border-left: 2px solid var(--border-2);
+}
+.maj-fill { position: relative; border-radius: 0 2px 2px 0; }
+/* strata + cylinder shading: the core reads as a solid object, not a bar */
+.maj-fill::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, rgba(0,0,0,.26) 0 1px, transparent 1px 5px),
+    linear-gradient(180deg, rgba(255,255,255,.26), rgba(255,255,255,.04) 42%, rgba(0,0,0,.34));
+}
+/* the cut face at the end of the core */
+.maj-fill::before {
+  content: ""; position: absolute; top: 0; right: 0; bottom: 0; width: 2px;
+  background: rgba(239,236,229,.55);
+}
+.maj-axis-note { font-family: var(--fm); font-size: .56rem; letter-spacing: .06em; text-transform: uppercase; color: var(--faint); padding: 0 1rem .5rem; }
+
+/* FIX: .majors-list was a card grid in the original build; P1 rebuilt its
+   contents as a legend + bar chart + detail panel, which must stack. Without
+   this the children get laid out as grid cells and the chart collapses. */
+.majors-list { display: block; }
+
+/* FIX (latent since P1-1): .maj-fill is a <span> inside .maj-track, so it
+   defaulted to display:inline — where width/height do not apply. The fills
+   were 0×0 and the chart rendered as empty tracks. The track escaped this
+   only because .maj-row is a grid and blockifies its children. */
+.maj-fill { display: block; }

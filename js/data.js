@@ -44,6 +44,13 @@ const BUDGET_YEARS_1P5 = 4;            // GCP 2025: ~4 years at 2025 emission le
 const BUDGET_PROB = "50% chance";      // probability caveat (GCP remaining-budget table)
 const BUDGET_EXHAUST_DATE = "2029-01-01T00:00:00Z";
 
+/* Pre-industrial atmospheric CO₂ — the level the air held before us, read
+   from ice cores (trapped air). ~280 ppm; NOAA GML (already cited on the CO₂
+   indicator). The deep EPICA Dome C 800,000-year series is NOT shipped: it
+   needs verifying against the primary record on build day before any claim
+   about the long baseline goes on screen. See DATA-SOURCES.md. */
+const CO2_PREINDUSTRIAL = 280;
+
 /* Forest ticker: latest tropical primary-forest loss ÷ minutes per year. */
 const FOREST_HA_PER_MIN = FOREST_HA_2024 / 525600; // ≈ 12.75 ha/min, GFW/WRI 2024
 
