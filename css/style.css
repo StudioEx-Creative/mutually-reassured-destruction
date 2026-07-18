@@ -6,12 +6,31 @@
 *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
+  /* ═══ BRAND LAYER ═══════════════════════════════════════════════
+     The brand speaks FOREST. Ember and ice are a DATA ENCODING — they
+     mean carbon/heat and cryosphere/ocean — so they are never used for
+     titles, nav or UI. A title in ember reads as a data value; it isn't.
+     This is why the old palette failed on type and worked on graphs. */
   --black: #000;
-  --near-black: #06080a;
-  --panel: #0b0e12;
-  --panel-2: #0e1217;
+  --near-black: #070a06;      /* black with green in it, not blue */
+  --panel: #0d1310;
+  --panel-2: #121a14;
 
-  /* two accents, max — heat & cold */
+  /* the living world — the brand's own voice */
+  --forest: #2d5537;          /* pine (from the reference board) */
+  --forest-deep: #1a2a1d;
+  --forest-lit: #6f9c72;      /* legible green for links/UI on dark */
+  --moss: #8fae86;
+
+  --bone: #f2efe6;            /* paper white — titles, statements */
+  --text: #eae7dd;
+  --muted: #97a394;           /* greened grey, not blue-grey */
+  --faint: #63705f;
+  --border: #1a231b;
+  --border-2: #26332a;
+
+  /* ═══ DATA ENCODING — DO NOT USE FOR BRAND/UI ═══════════════════
+     ember = carbon & heat · ice = cryosphere & ocean. Unchanged. */
   --ember: #ff6b35;
   --ember-deep: #b23a14;
   --ember-glow: rgba(255,107,53,.4);
@@ -19,15 +38,13 @@
   --ice-deep: #2a6f8c;
   --ice-glow: rgba(110,199,232,.35);
 
-  --text: #e9ecef;
-  --muted: #8593a0;
-  --faint: #58626c;
-  --border: #171c22;
-  --border-2: #20272f;
-
-  --fd: "Source Serif 4", Georgia, serif;     /* display */
-  --fb: "Inter", system-ui, sans-serif;        /* body / data */
-  --fm: "IBM Plex Mono", ui-monospace, monospace; /* labels — sibling DNA w/ CoW */
+  /* ═══ TYPE ══════════════════════════════════════════════════════
+     Heavy grotesque carries the identity; mono keeps the data clinical.
+     The serif is retired from titles — it was too polite for a page
+     being torn apart. */
+  --fd: "Archivo", "Helvetica Neue", Arial, sans-serif;  /* display */
+  --fb: "Inter", system-ui, sans-serif;                   /* body / data */
+  --fm: "IBM Plex Mono", ui-monospace, monospace;         /* labels */
 
   --maxw: 1180px;
   --ease: cubic-bezier(.16,1,.3,1);
@@ -748,3 +765,94 @@ footer a { color: var(--faint); }
    were 0×0 and the chart rendered as empty tracks. The track escaped this
    only because .maj-row is a grid and blockifies its children. */
 .maj-fill { display: block; }
+
+/* ═══════════════════════════════════════════════════════════════════
+   BRAND REDESIGN · forest voice, heavy grotesque
+   The title is BONE, not ember. Ember/ice now appear only where they
+   encode data, so when you see ember it means carbon — every time.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* ── display type: heavy, tight, condensed ── */
+.hero-title, .sec-title, .coda-title, .md-name, .pg-stat, .fc-temp,
+.ticker-num, .ticker-sub-num, .ice-num, .coalition-num, .fl-v,
+.detail-box h3, .detail-val, .sub-t, .globe-h, .st-wm, .breath p,
+.closing-line, .cut-line, .majors-stat .big, .cc-name, .cc-stat .cc-v {
+  font-family: var(--fd);
+  font-variation-settings: "wdth" 88;      /* TUNE: condensed-ness */
+  letter-spacing: -.025em;
+}
+.hero-title {
+  font-weight: 800; color: var(--bone);
+  font-size: clamp(3rem, 11vw, 9rem); line-height: .86;
+  text-transform: uppercase;
+  font-variation-settings: "wdth" 82;
+}
+/* the accent word: bone, weighted — NOT ember. Ember means carbon. */
+.hero-title .mad-ember {
+  color: var(--bone); font-style: normal; display: block;
+  -webkit-text-stroke: 0; opacity: .55;    /* TUNE: the quiet word */
+  text-shadow: none;
+}
+.sec-title { font-weight: 800; color: var(--bone); line-height: .94; text-transform: uppercase; font-size: clamp(2.1rem, 6vw, 4.2rem); }
+.sec-title em, .sec-title.ice em { font-style: normal; color: var(--forest-lit); }
+.coda-title { font-weight: 800; text-transform: uppercase; line-height: .92; }
+.coda-title em { font-style: normal; color: var(--forest-lit); }
+.breath p, .closing-line, .cut-line { font-style: normal; font-weight: 700; text-transform: none; }
+
+/* ── brand accents move from ember/ice to forest ── */
+.eyebrow, .hero-eyebrow { color: var(--moss); }
+.itin-n, .itin-item.ice .itin-n, .itin-item.act .itin-n { color: var(--forest-lit); }
+.coda-eyebrow { color: var(--forest-lit); }
+.live-dot { background: var(--forest-lit); box-shadow: 0 0 10px var(--forest-lit); }
+.step-label { color: var(--forest-lit); }
+a { color: var(--forest-lit); }
+.navpill .np-say { color: var(--forest-lit); }
+.btn-primary { background: var(--forest-lit); color: var(--near-black); border-color: var(--forest-lit); }
+.btn-primary:hover { background: var(--moss); }
+.continue-btn:hover { border-color: var(--forest-lit); color: var(--forest-lit); }
+.continue-btn .ar { color: var(--forest-lit); }
+:focus-visible { outline-color: var(--forest-lit); }
+.skip-link { background: var(--forest-lit); }
+::selection { background: var(--forest); color: var(--bone); }
+.prio-card.on { background: rgba(111,156,114,.08); }
+.prio-card.on .prio-rank { background: var(--forest-lit); color: var(--near-black); border-color: var(--forest-lit); }
+.prio-card.on .prio-name { color: var(--forest-lit); }
+.ordered-n { color: var(--forest-lit); }
+.coalition-num { color: var(--forest-lit); text-shadow: 0 0 50px rgba(111,156,114,.35); }
+.cc-stat .cc-v.ice { color: var(--forest-lit); }
+.cc-rating.ok { color: var(--forest-lit); border-color: var(--forest); }
+.letter-body { background: #0a0f0b; }
+.prio-src:hover, .md-src a, .fl-src a, .stripes-cap a, .ice-cap a { color: var(--forest-lit); }
+
+/* body copy: heavier, so it stops feeling thin next to the display */
+body { font-weight: 400; }
+.sec-desc { font-weight: 450; color: var(--muted); }
+.sec-desc b { font-weight: 700; color: var(--bone); }
+.hero-sub { font-weight: 450; color: var(--muted); }
+
+/* the counters keep ember/ice — they ARE data */
+.ticker-num { font-weight: 800; }
+.ticker-sub-num, .ice-num, .fl-v { font-weight: 800; }
+.fc-temp { font-weight: 800; }
+
+/* ── hero refinements ──
+   "REASSURED" was reading as disabled at low opacity. Instead make it an
+   OUTLINE: the word is present but hollow — the reassurance is the empty
+   promise in the title. Full contrast, no opacity trick. */
+.hero-title .mad-ember {
+  opacity: 1;
+  color: transparent;
+  -webkit-text-stroke: 2px var(--bone);
+  paint-order: stroke fill;
+}
+@media (max-width: 640px) { .hero-title .mad-ember { -webkit-text-stroke-width: 1.4px; } }
+
+/* the ticker needs to read as an instrument panel again on the busy field */
+.ticker {
+  background: rgba(7,10,6,.72);
+  backdrop-filter: blur(3px);
+  border-color: var(--border-2);
+  border-radius: 3px;
+}
+.ticker-lbl, .ticker-foot, .ticker-sub-lbl, .ticker-budget-lbl { color: var(--muted); }
+.ticker-src a { color: var(--faint); }

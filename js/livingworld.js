@@ -128,8 +128,19 @@
       // alternating shear, eased — the record pulled out of alignment
       const dir = b % 2 ? 1 : -1;
       const ease = progress * progress;
-      const dx = reduce ? 0 : dir * ease * (18 + (b % 3) * 26); // TUNE: slip distance
+      const dx = reduce ? 0 : dir * ease * W * (0.34 + (b % 3) * 0.17); // TUNE: slip distance (fraction of frame)
+      // the ground the slip exposes: raw cut earth, not empty black
+      if (Math.abs(dx) > 1) {
+        ctx.fillStyle = `rgba(122,74,40,${0.30 + ease * 0.45})`;   // TUNE: cut-earth tone
+        if (dx > 0) ctx.fillRect(0, b * bh, dx, bh);
+        else ctx.fillRect(W + dx, b * bh, -dx, bh);
+      }
       ctx.drawImage(off, 0, b * bh, W, bh, dx, b * bh, W, bh);
+      // the severed edge
+      if (Math.abs(dx) > 1) {
+        ctx.fillStyle = `rgba(239,236,229,${0.16 + ease * 0.24})`;
+        ctx.fillRect(dx > 0 ? dx : W + dx, b * bh, 1.2, bh);
+      }
     }
     if (progress > 0.01 && !reduce) {
       // heat bleeds into the wound as the world is cut

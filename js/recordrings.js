@@ -129,14 +129,6 @@
 
     for (let i = 0; i < N; i++) band(i);   // the whole record, wound → unwound
 
-    // the pith: where the record begins. Only meaningful while it's a tree.
-    const aPith = 1 - smooth(0.35, 0.7, q);
-    if (aPith > 0.01) {
-      ctx.globalAlpha = aPith;
-      ctx.beginPath(); ctx.arc(W / 2, H / 2, Math.min(W, H) * PITH * 0.55, 0, 7);
-      ctx.fillStyle = "#10160d"; ctx.fill();
-      ctx.globalAlpha = 1;
-    }
 
     // contextual markings — the years that carry the argument
     const aMarks = smooth(0.82, 0.97, q);
