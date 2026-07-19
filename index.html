@@ -19,7 +19,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,75..100,400..900;1,75..100,400..900&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="css/style.css?v=2026r47" />
+    <link rel="stylesheet" href="css/style.css?v=2026r54" />
   </head>
   <body>
     <a class="skip-link" href="#record">Skip to the content</a>
@@ -293,11 +293,25 @@
 
           <div class="sub-h rv">03a · States</div>
           <div class="sub-t rv">Who put the carbon there</div>
-          <div class="ledger-tabs rv rv-d1" role="group" aria-label="Emissions view">
+          <div class="ledger-tabs ledger-tabs-stick rv rv-d1" role="group" aria-label="Emissions view">
             <button class="ledger-tab on" data-view="cumPct">Cumulative since 1850</button>
             <button class="ledger-tab" data-view="annPct">Annual (2024)</button>
             <button class="ledger-tab" data-view="perCap">Per person</button>
           </div>
+          <!-- ═══ WHO PUT THE CARBON THERE · ON THE GLOBE ═══
+               Bars rank; a globe locates. Responsibility is a fact of
+               geography. The argument is the SWITCH: cumulative, annual and
+               per-person rebuild the world differently, and the tabs above
+               drive both the globe and the bars. -->
+          <div class="gv-scene rv rv-d1" id="gvScene" aria-label="Emissions by nation, on a globe">
+            <div class="gv-sticky">
+              <canvas id="gvCanvas" role="img"
+                aria-label="A schematic globe with a column rising from each major emitting nation, its height proportional to the selected measure. Scrolling spins the globe."
+                aria-describedby="gvDesc"></canvas>
+            </div>
+          </div>
+          <p class="visually-hidden" id="gvDesc">A rotating schematic globe. A column rises from each major emitting nation and its height is proportional to the currently selected measure. Under cumulative emissions since 1850 the tallest columns stand over the United States and Europe; switching to today's annual emissions makes China's the tallest; switching to emissions per person rearranges the ranking again. The same figures are listed as bars beneath. The globe carries a latitude and longitude grid rather than coastlines and is a schematic, not a map.</p>
+
           <div class="bars rv rv-d1" id="statesBars"></div>
           <p class="map-note rv rv-d2" id="statesNote"></p>
 
@@ -640,17 +654,18 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/config.js?v=2026r47" defer></script>
-    <script src="js/data.js?v=2026r47" defer></script>
-    <script src="js/backend.js?v=2026r47" defer></script>
-    <script src="js/hazard.js?v=2026r47" defer></script>
-    <script src="js/map.js?v=2026r47" defer></script>
-    <script src="js/livingworld.js?v=2026r47" defer></script>
-    <script src="js/cutscene.js?v=2026r47" defer></script>
-    <script src="js/recordrings.js?v=2026r47" defer></script>
-    <script src="js/icecore.js?v=2026r47" defer></script>
-    <script src="js/oceanheat.js?v=2026r47" defer></script>
-    <script src="js/arcticice.js?v=2026r47" defer></script>
-    <script src="js/main.js?v=2026r47" defer></script>
+    <script src="js/config.js?v=2026r54" defer></script>
+    <script src="js/data.js?v=2026r54" defer></script>
+    <script src="js/backend.js?v=2026r54" defer></script>
+    <script src="js/hazard.js?v=2026r54" defer></script>
+    <script src="js/map.js?v=2026r54" defer></script>
+    <script src="js/livingworld.js?v=2026r54" defer></script>
+    <script src="js/cutscene.js?v=2026r54" defer></script>
+    <script src="js/recordrings.js?v=2026r54" defer></script>
+    <script src="js/icecore.js?v=2026r54" defer></script>
+    <script src="js/oceanheat.js?v=2026r54" defer></script>
+    <script src="js/arcticice.js?v=2026r54" defer></script>
+    <script src="js/globeledger.js?v=2026r54" defer></script>
+    <script src="js/main.js?v=2026r54" defer></script>
   </body>
 </html>

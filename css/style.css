@@ -959,3 +959,22 @@ body { font-weight: 400; }
   .ice-scene { height: 72svh; }
   .is-sticky { position: static; height: 72svh; }
 }
+
+/* ═══ CH03a · THE LEDGER ON A GLOBE ═══
+   Scroll spins it; the ledger tabs rebuild it. */
+.gv-scene { position: relative; height: 260vh; margin: .6rem 0 1.4rem; }  /* TUNE: spin length */
+/* the globe sits below the sticky control so the two never overlap */
+.gv-sticky { position: sticky; top: 3.2rem; height: calc(100svh - 3.2rem); }
+#gvCanvas { width: 100%; height: 100%; display: block; }
+/* One control, and it rides with you: the globe scene is 260vh, so tabs that
+   scrolled away would strand the reader mid-scene with nothing to switch. */
+.ledger-tabs-stick { position: sticky; top: 0; z-index: 3; padding: .7rem 0; margin-bottom: .6rem;
+  background: linear-gradient(180deg, var(--near-black) 62%, transparent); }
+.ledger-tabs-stick .ledger-tab { background: rgba(7,10,6,.72); backdrop-filter: blur(6px); }
+.ledger-tabs-stick .ledger-tab.on { background: var(--text); color: var(--near-black); }
+/* Reduced motion last, so nothing below can override the static fallback. */
+@media (prefers-reduced-motion: reduce) {
+  .gv-scene { height: 70svh; }
+  .gv-sticky { position: static; height: 70svh; }
+  .ledger-tabs-stick { position: static; background: none; }
+}

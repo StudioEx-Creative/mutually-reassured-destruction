@@ -328,7 +328,11 @@ function buildStates() {
 function initStatesTabs() {
   document.querySelectorAll(".ledger-tab").forEach((t) => t.addEventListener("click", () => {
     document.querySelectorAll(".ledger-tab").forEach((x) => x.classList.remove("on"));
-    t.classList.add("on"); statesView = t.dataset.view; buildStates();
+    statesView = t.dataset.view;
+    // two sets of these exist (one pinned with the globe) — keep them in step
+    document.querySelectorAll('.ledger-tab[data-view="' + statesView + '"]').forEach((x) => x.classList.add("on"));
+    buildStates();
+    if (typeof window.__globeLedger === "function") window.__globeLedger();   // the globe reads the same tab
   }));
 }
 function animateBars(wrap) {
