@@ -482,7 +482,9 @@ async function flReverseGeocode(lat, lng) {
     return [j.city || j.locality, j.countryCode].filter(Boolean).join(", ") || "your area";
   } catch (_) { return "your area"; }
 }
+let __flSeq = 0;   // only the most recent request may paint (see below)
 async function runLocalForecast(lat, lng, label) {
+  const seq = ++__flSeq;
   flStatus("Loading your area's climate projection…");
   window.__madForecastLoc = { lat, lng, label: label || null };
   saveState();
@@ -491,6 +493,7 @@ async function runLocalForecast(lat, lng, label) {
     const url = `https://climate-api.open-meteo.com/v1/climate?latitude=${lat}&longitude=${lng}` +
       `&start_date=2000-01-01&end_date=2049-12-31&models=MRI_AGCM3_2_S&daily=temperature_2m_mean,temperature_2m_max&temperature_unit=celsius`;
     const j = await (await fetch(url)).json();
+    if (seq !== __flSeq) return;   // a newer place was requested; discard this one
     const t = j.daily.time, mean = j.daily.temperature_2m_mean, mx = j.daily.temperature_2m_max;
     const yr = {}; // year → {sum,n,hot}
     for (let i = 0; i < t.length; i++) {
@@ -499,23 +502,66 @@ async function runLocalForecast(lat, lng, label) {
       if (mean[i] != null) { o.sum += mean[i]; o.n++; }
       if (mx[i] != null && mx[i] >= 30) o.hot++;
     }
-    const decMean = (a, b) => { let s = 0, c = 0; for (let y = a; y <= b; y++) if (yr[y] && yr[y].n) { s += yr[y].sum / yr[y].n; c++; } return c ? s / c : null; };
-    const decHot = (a, b) => { let s = 0, c = 0; for (let y = a; y <= b; y++) if (yr[y]) { s += yr[y].hot; c++; } return c ? s / c : null; };
-    const m2000 = decMean(2000, 2009), m2040 = decMean(2040, 2049);
-    const h2010 = decHot(2010, 2019), h2040 = decHot(2040, 2049);
-    if (m2000 == null || m2040 == null) throw new Error("insufficient data");
-    const warming = m2040 - m2000;
+    /* ── THIS MONTH, WHERE YOU ARE, THEN AND NOW ──
+       Greg's framing: "your average June day — this is what it looks like in
+       2050." Annual means are abstract; the month the reader is actually
+       standing in is not. So we read the SAME CALENDAR MONTH across the
+       record: the 2000s baseline vs the 2040s, in their own place. */
+    const MONTHS = ["January","February","March","April","May","June",
+                    "July","August","September","October","November","December"];
+    const nowM = new Date().getMonth();                  // the month they're in
+    const mo = {};                                        // "yyyy-mm" → {sum,n,hot,maxes[]}
+    for (let i = 0; i < t.length; i++) {
+      if (+t[i].slice(5, 7) - 1 !== nowM) continue;       // this calendar month only
+      const y = +t[i].slice(0, 4);
+      const o = (mo[y] = mo[y] || { sum: 0, n: 0, hot: 0, maxes: [] });
+      if (mean[i] != null) { o.sum += mean[i]; o.n++; }
+      if (mx[i] != null) { o.maxes.push(mx[i]); if (mx[i] >= 30) o.hot++; }
+    }
+    const span = (a, b, pick) => {
+      let s = 0, c = 0;
+      for (let y = a; y <= b; y++) { const o = mo[y]; if (!o || !o.n) continue; s += pick(o); c++; }
+      return c ? s / c : null;
+    };
+    const meanOf = (o) => o.sum / o.n;
+    const hotOf = (o) => o.hot;
+    const peakOf = (o) => (o.maxes.length ? o.maxes.slice().sort((x, y) => y - x)[Math.floor(o.maxes.length * 0.1)] : 0); // ~hottest 10% day
+
+    /* 20-year windows, not 10: a single model's decade carries real weather
+       noise, and for a temperate city the hot-day count is a small number that
+       can fall by chance. Wider windows make the signal honest. */
+    const nowMean = span(2000, 2019, meanOf), futMean = span(2030, 2049, meanOf);
+    const nowHot = span(2000, 2019, hotOf), futHot = span(2030, 2049, hotOf);
+    const nowPeak = span(2000, 2019, peakOf), futPeak = span(2030, 2049, peakOf);
+    if (nowMean == null || futMean == null) throw new Error("insufficient data");
+    const warming = futMean - nowMean;
+    const monthName = MONTHS[nowM];
+
     byId("flResult").innerHTML = `
-      <div class="fl-place">${label}</div>
-      <div class="fl-grid">
-        <div class="fl-stat"><div class="fl-v ember">+${warming.toFixed(1)} °C</div><div class="fl-k">annual mean warming, 2000s → 2040s</div></div>
-        <div class="fl-stat"><div class="fl-v">${m2000.toFixed(1)} → ${m2040.toFixed(1)} °C</div><div class="fl-k">local average temperature</div></div>
-        ${h2010 != null && h2040 != null ? `<div class="fl-stat"><div class="fl-v ember">${Math.round(h2010)} → ${Math.round(h2040)}</div><div class="fl-k">days above 30 °C per year</div></div>` : ""}
+      <div class="fl-place">${label} · ${monthName}</div>
+      <div class="fl-compare">
+        <div class="fl-then">
+          <div class="fl-when">An average ${monthName}, 2000–2019</div>
+          <div class="fl-temp">${nowMean.toFixed(1)}<span>°C</span></div>
+          <div class="fl-note">${Math.round(nowHot)} day${Math.round(nowHot) === 1 ? "" : "s"} above 30 °C${nowPeak ? ` · hottest ≈${nowPeak.toFixed(0)} °C` : ""}</div>
+        </div>
+        <div class="fl-arrow" aria-hidden="true">→</div>
+        <div class="fl-now">
+          <div class="fl-when">The same ${monthName}, 2030–2049</div>
+          <div class="fl-temp ember">${futMean.toFixed(1)}<span>°C</span></div>
+          <div class="fl-note">${Math.round(futHot)} day${Math.round(futHot) === 1 ? "" : "s"} above 30 °C${futPeak ? ` · hottest ≈${futPeak.toFixed(0)} °C` : ""}</div>
+        </div>
       </div>
-      <div class="fl-src">Downscaled CMIP6 (MRI-AGCM3-2-S, high-emission), via <a href="https://open-meteo.com/en/docs/climate-api" target="_blank" rel="noopener">Open-Meteo Climate API ↗</a>. One model shown; the direction, not the decimal, is the point.</div>`;
+      <div class="fl-verdict">In ${label}, ${monthName} warms by <b>${warming >= 0 ? "+" : ""}${warming.toFixed(1)} °C</b>${
+        (futHot - nowHot >= 1 && futHot >= nowHot * 1.25)
+          ? ` and gains <b>${Math.round(futHot - nowHot)}</b> more day${Math.round(futHot - nowHot) === 1 ? "" : "s"} above 30 °C`
+          : ""
+      } — within the lifetime of a mortgage.</div>
+      <div class="fl-src">Same calendar month, 2000–2019 vs 2030–2049 (20-year means, so a single hot or cool decade cannot swing it). Downscaled CMIP6 (MRI-AGCM3-2-S, high-emission) via <a href="https://open-meteo.com/en/docs/climate-api" target="_blank" rel="noopener">Open-Meteo Climate API ↗</a>. One model, one high-emission pathway — the direction, not the decimal, is the point.</div>`;
     byId("flResult").classList.add("show");
     flStatus("");
   } catch (e) {
+    if (seq !== __flSeq) return;
     byId("flResult").classList.remove("show");
     flStatus(selectedCountry
       ? `Couldn't load a local projection here. Your country, ${selectedCountry[0]}, is rated "${selectedCountry[2]}" against the 1.5 °C pathway (Climate Action Tracker).`
