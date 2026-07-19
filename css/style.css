@@ -892,3 +892,51 @@ body { font-weight: 400; }
   .fl-compare { grid-template-columns: 1fr; gap: .7rem; }
   .fl-arrow { transform: rotate(90deg); justify-self: center; }
 }
+
+/* ═══ CH04 · YOUR MONTH, DAY BY DAY (interactive) ═══
+   A grid of real days the reader can scrub through time. The instrument is
+   the point: drag the year, watch your own month heat up. */
+.fl-toolbar { display: flex; align-items: center; gap: .9rem; margin: 1.2rem 0 .9rem; }
+.fl-scrub-lbl { font-family: var(--fm); font-size: .58rem; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); white-space: nowrap; }
+.fl-scrub { flex: 1; accent-color: var(--ember); height: 4px; cursor: pointer; }
+.fl-year {
+  font-family: var(--fd); font-variation-settings: "wdth" 88; font-weight: 800;
+  font-size: 1.5rem; color: var(--bone); min-width: 4ch; text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+.fl-grid-wrap { margin: .2rem 0 .9rem; }
+.fl-daygrid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(20px, 1fr));
+  gap: 4px;                                   /* TUNE: day spacing */
+}
+.fl-day { aspect-ratio: 1; border-radius: 2px; display: block; transition: background .35s var(--ease); }
+.fl-day-hot { box-shadow: inset 0 0 0 2px rgba(255,255,255,.85); }   /* a day over 30 °C */
+.fl-day-na { background: var(--border); }
+.fl-legend {
+  display: flex; align-items: center; gap: .5rem; margin-top: .7rem;
+  font-family: var(--fm); font-size: .56rem; color: var(--muted); flex-wrap: wrap;
+}
+.fl-ramp { width: 110px; height: 8px; border-radius: 99px;
+  background: linear-gradient(90deg, #6ec7e8, #f2efe6 50%, #ff6b35); }
+.fl-legend-hot { margin-left: auto; color: var(--faint); }
+.fl-readout {
+  display: flex; flex-wrap: wrap; gap: .5rem 1.4rem; align-items: baseline;
+  border-top: 1px solid var(--border); padding-top: .8rem; margin-bottom: .8rem;
+}
+.fl-r-year { font-family: var(--fm); font-size: .6rem; letter-spacing: .12em; color: var(--muted); }
+.fl-r-stat { font-size: .84rem; color: var(--muted); }
+.fl-r-stat b { font-family: var(--fd); font-variation-settings: "wdth" 88; font-weight: 800;
+  font-size: 1.3rem; color: var(--bone); margin-right: .15rem; }
+.fl-r-stat.hot b { color: var(--ember); }
+@media (prefers-reduced-motion: reduce) { .fl-day { transition: none; } }
+
+/* ── day-grid presence ──
+   The cells were too small and too pale to feel like anything. A month is 31
+   days: give them size, let them breathe, and put them on a dark bed so the
+   pale/hot end actually reads. TUNE: min cell size. */
+.fl-grid-wrap { background: rgba(0,0,0,.35); border: 1px solid var(--border-2);
+  border-radius: 6px; padding: 1rem; }
+.fl-daygrid { grid-template-columns: repeat(auto-fit, minmax(34px, 1fr)); gap: 6px; }
+.fl-day { border-radius: 3px; min-height: 34px; }
+.fl-scrub { accent-color: var(--ember); height: 6px; }
+.fl-year { font-size: 2rem; color: var(--ember); }

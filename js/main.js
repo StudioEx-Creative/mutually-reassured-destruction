@@ -482,6 +482,77 @@ async function flReverseGeocode(lat, lng) {
     return [j.city || j.locality, j.countryCode].filter(Boolean).join(", ") || "your area";
   } catch (_) { return "your area"; }
 }
+/* Redraw the day-grid for a given year. Pure render off __flTool — no
+   refetch, so scrubbing is instant. Colour is anchored to this location's own
+   5th–95th percentile, so the warming reads whether the reader is in a
+   temperate or a tropical city. TUNE: HOT threshold. */
+const FL_HOT = 30;                       // °C — the day that counts as hot
+function flRenderGrid(year) {
+  const T = window.__flTool;
+  if (!T) return;
+  const out = byId("flYearOut"); if (out) out.textContent = year;
+  const grid = byId("flDayGrid"); if (!grid) return;
+
+  /* Colour = the 11-year mean for that calendar day (smooth, scrubable).
+     But a MEAN hides extremes — the average 14th of July never reaches 30 °C
+     even in a decade where several actual 14ths do. So the hot signal is read
+     from the real daily values instead: how OFTEN that calendar day breaks
+     30 °C across the window. Summing those probabilities across the month
+     gives the expected number of hot days in a typical year, which is the
+     honest figure and the one that actually moves as you scrub. */
+  const W0 = year - 5, W1 = year + 5;
+  let sum = 0, n = 0, expectedHot = 0, peakSum = 0, peakN = 0;
+
+  // typical hottest day: mean of each year's hottest day in the window
+  for (let y = W0; y <= W1; y++) {
+    let ymax = -Infinity;
+    T.days.forEach((d) => { const v = T.byDay[d] && T.byDay[d][y]; if (v != null && v > ymax) ymax = v; });
+    if (ymax > -Infinity) { peakSum += ymax; peakN++; }
+  }
+
+  const cells = T.days.map((d) => {
+    const v = T.clim(d, year);
+    if (v == null) return `<span class="fl-day fl-day-na"></span>`;
+    sum += v; n++;
+    // how often this calendar day breaks 30 °C across the window
+    let hits = 0, yrs = 0;
+    for (let y = W0; y <= W1; y++) {
+      const a = T.byDay[d] && T.byDay[d][y];
+      if (a == null) continue;
+      yrs++; if (a >= FL_HOT) hits++;
+    }
+    const freq = yrs ? hits / yrs : 0;
+    expectedHot += freq;
+    const f = Math.max(0, Math.min(1, (v - T.LO) / ((T.HI - T.LO) || 1)));
+    const c = f < 0.5
+      ? [Math.round(110 + (242 - 110) * (f / 0.5)), Math.round(199 + (239 - 199) * (f / 0.5)), Math.round(232 + (230 - 232) * (f / 0.5))]
+      : [Math.round(242 + (255 - 242) * ((f - 0.5) / 0.5)), Math.round(239 + (107 - 239) * ((f - 0.5) / 0.5)), Math.round(230 + (53 - 230) * ((f - 0.5) / 0.5))];
+    /* A binary "hot day" marker is the wrong instrument: heat doesn't land on
+       the same calendar DATE each year, so no single day clears a high
+       threshold and the marker never fires. Grade it instead — the ring's
+       strength IS the probability that this date breaks 30 °C, so the month
+       visibly gains rings as the reader scrubs forward. */
+    const ring = freq > 0.04
+      ? `box-shadow:inset 0 0 0 2px rgba(255,255,255,${(0.18 + freq * 0.8).toFixed(2)});`
+      : "";
+    return `<span class="fl-day" style="background:rgb(${c[0]},${c[1]},${c[2]});${ring}" title="${T.monthName} ${d} · typically ${v.toFixed(1)} °C · breaks ${FL_HOT} °C in ${Math.round(freq * 100)}% of years"></span>`;
+  }).join("");
+  grid.innerHTML = cells;
+
+  const avg = sum / (n || 1);
+  const hotN = Math.round(expectedHot);
+  const peak = peakN ? peakSum / peakN : null;
+  grid.setAttribute("aria-label",
+    `${T.monthName} in ${T.label}, around ${year}: typical day ${avg.toFixed(1)} degrees, about ${hotN} day${hotN === 1 ? "" : "s"} above ${FL_HOT} degrees in a normal year.`);
+
+  const read = byId("flReadout");
+  if (read) read.innerHTML =
+    `<span class="fl-r-year">around ${year}</span>
+     <span class="fl-r-stat"><b>${avg.toFixed(1)}</b> °C typical day</span>
+     <span class="fl-r-stat${hotN ? " hot" : ""}"><b>${hotN}</b> day${hotN === 1 ? "" : "s"} over ${FL_HOT} °C a year</span>
+     <span class="fl-r-stat"><b>${peak != null ? peak.toFixed(1) : "—"}</b> °C hottest day</span>`;
+}
+
 let __flSeq = 0;   // only the most recent request may paint (see below)
 async function runLocalForecast(lat, lng, label) {
   const seq = ++__flSeq;
@@ -502,62 +573,71 @@ async function runLocalForecast(lat, lng, label) {
       if (mean[i] != null) { o.sum += mean[i]; o.n++; }
       if (mx[i] != null && mx[i] >= 30) o.hot++;
     }
-    /* ── THIS MONTH, WHERE YOU ARE, THEN AND NOW ──
-       Greg's framing: "your average June day — this is what it looks like in
-       2050." Annual means are abstract; the month the reader is actually
-       standing in is not. So we read the SAME CALENDAR MONTH across the
-       record: the 2000s baseline vs the 2040s, in their own place. */
+    /* ── YOUR MONTH, DAY BY DAY — an instrument, not a readout ──
+       The API returns DAILY values; averaging them away threw the most
+       legible thing in the dataset on the floor. So the reader gets their own
+       month as a grid of days they can scrub through time: drag the year and
+       watch individual days heat up.
+
+       Each cell is an 11-year CENTRED CLIMATOLOGY for that calendar day — the
+       average conditions for, say, the 14th of July around a given year. That
+       is a climate, not a weather forecast, and it is labelled as such: it is
+       smooth enough to scrub honestly, where single years would jitter with
+       model noise and imply a precision the model cannot carry. */
     const MONTHS = ["January","February","March","April","May","June",
                     "July","August","September","October","November","December"];
-    const nowM = new Date().getMonth();                  // the month they're in
-    const mo = {};                                        // "yyyy-mm" → {sum,n,hot,maxes[]}
-    for (let i = 0; i < t.length; i++) {
-      if (+t[i].slice(5, 7) - 1 !== nowM) continue;       // this calendar month only
-      const y = +t[i].slice(0, 4);
-      const o = (mo[y] = mo[y] || { sum: 0, n: 0, hot: 0, maxes: [] });
-      if (mean[i] != null) { o.sum += mean[i]; o.n++; }
-      if (mx[i] != null) { o.maxes.push(mx[i]); if (mx[i] >= 30) o.hot++; }
-    }
-    const span = (a, b, pick) => {
-      let s = 0, c = 0;
-      for (let y = a; y <= b; y++) { const o = mo[y]; if (!o || !o.n) continue; s += pick(o); c++; }
-      return c ? s / c : null;
-    };
-    const meanOf = (o) => o.sum / o.n;
-    const hotOf = (o) => o.hot;
-    const peakOf = (o) => (o.maxes.length ? o.maxes.slice().sort((x, y) => y - x)[Math.floor(o.maxes.length * 0.1)] : 0); // ~hottest 10% day
-
-    /* 20-year windows, not 10: a single model's decade carries real weather
-       noise, and for a temperate city the hot-day count is a small number that
-       can fall by chance. Wider windows make the signal honest. */
-    const nowMean = span(2000, 2019, meanOf), futMean = span(2030, 2049, meanOf);
-    const nowHot = span(2000, 2019, hotOf), futHot = span(2030, 2049, hotOf);
-    const nowPeak = span(2000, 2019, peakOf), futPeak = span(2030, 2049, peakOf);
-    if (nowMean == null || futMean == null) throw new Error("insufficient data");
-    const warming = futMean - nowMean;
+    const nowM = new Date().getMonth();
     const monthName = MONTHS[nowM];
 
+    const byDay = {};                       // day-of-month → { year: dailyMax }
+    for (let i = 0; i < t.length; i++) {
+      if (+t[i].slice(5, 7) - 1 !== nowM) continue;
+      if (mx[i] == null) continue;
+      const d = +t[i].slice(8, 10), y = +t[i].slice(0, 4);
+      (byDay[d] = byDay[d] || {})[y] = mx[i];
+    }
+    const days = Object.keys(byDay).map(Number).sort((a, b) => a - b);
+    if (!days.length) throw new Error("no daily data");
+
+    const clim = (d, year) => {             // centred 11-year mean for that day
+      let s = 0, c = 0;
+      for (let y = year - 5; y <= year + 5; y++) {
+        const v = byDay[d] && byDay[d][y];
+        if (v != null) { s += v; c++; }
+      }
+      return c ? s / c : null;
+    };
+    // colour range anchored to THIS place's own record, so the shift is visible
+    // whether the reader is in London or Lagos
+    const allV = [];
+    days.forEach((d) => Object.values(byDay[d]).forEach((v) => allV.push(v)));
+    allV.sort((a, b) => a - b);
+    const LO = allV[Math.floor(allV.length * 0.05)];
+    const HI = allV[Math.floor(allV.length * 0.95)];
+
+    window.__flTool = { days, byDay, clim, LO, HI, monthName, label };
+
     byId("flResult").innerHTML = `
-      <div class="fl-place">${label} · ${monthName}</div>
-      <div class="fl-compare">
-        <div class="fl-then">
-          <div class="fl-when">An average ${monthName}, 2000–2019</div>
-          <div class="fl-temp">${nowMean.toFixed(1)}<span>°C</span></div>
-          <div class="fl-note">${Math.round(nowHot)} day${Math.round(nowHot) === 1 ? "" : "s"} above 30 °C${nowPeak ? ` · hottest ≈${nowPeak.toFixed(0)} °C` : ""}</div>
-        </div>
-        <div class="fl-arrow" aria-hidden="true">→</div>
-        <div class="fl-now">
-          <div class="fl-when">The same ${monthName}, 2030–2049</div>
-          <div class="fl-temp ember">${futMean.toFixed(1)}<span>°C</span></div>
-          <div class="fl-note">${Math.round(futHot)} day${Math.round(futHot) === 1 ? "" : "s"} above 30 °C${futPeak ? ` · hottest ≈${futPeak.toFixed(0)} °C` : ""}</div>
+      <div class="fl-place">${label} · your ${monthName}, day by day</div>
+      <div class="fl-toolbar">
+        <label class="fl-scrub-lbl" for="flYear">Drag the years</label>
+        <input class="fl-scrub" id="flYear" type="range" min="2005" max="2044" step="1" value="2010"
+               aria-label="Year, 2005 to 2044. Each day shows an eleven-year average centred on this year." />
+        <output class="fl-year" id="flYearOut">2010</output>
+      </div>
+      <div class="fl-grid-wrap">
+        <div class="fl-daygrid" id="flDayGrid" role="img" aria-describedby="flGridDesc"></div>
+        <div class="fl-legend">
+          <span>cooler</span><span class="fl-ramp" aria-hidden="true"></span><span>hotter</span>
+          <span class="fl-legend-hot">▨ ring = how often that day breaks 30 °C</span>
         </div>
       </div>
-      <div class="fl-verdict">In ${label}, ${monthName} warms by <b>${warming >= 0 ? "+" : ""}${warming.toFixed(1)} °C</b>${
-        (futHot - nowHot >= 1 && futHot >= nowHot * 1.25)
-          ? ` and gains <b>${Math.round(futHot - nowHot)}</b> more day${Math.round(futHot - nowHot) === 1 ? "" : "s"} above 30 °C`
-          : ""
-      } — within the lifetime of a mortgage.</div>
-      <div class="fl-src">Same calendar month, 2000–2019 vs 2030–2049 (20-year means, so a single hot or cool decade cannot swing it). Downscaled CMIP6 (MRI-AGCM3-2-S, high-emission) via <a href="https://open-meteo.com/en/docs/climate-api" target="_blank" rel="noopener">Open-Meteo Climate API ↗</a>. One model, one high-emission pathway — the direction, not the decimal, is the point.</div>`;
+      <div class="fl-readout" id="flReadout" aria-live="polite"></div>
+      <p class="visually-hidden" id="flGridDesc">A grid of one square per day of ${monthName} in ${label}. Each square is shaded by that day's typical maximum temperature, cool to hot. Dragging the year control forward shows the squares warming as the decades pass.</p>
+      <div class="fl-src">Each cell is an 11-year average for that calendar day — a climate, not a forecast. Downscaled CMIP6 (MRI-AGCM3-2-S, high-emission) via <a href="https://open-meteo.com/en/docs/climate-api" target="_blank" rel="noopener">Open-Meteo Climate API ↗</a>. One model, one high-emission pathway — the direction, not the decimal, is the point.</div>`;
+
+    byId("flYear").addEventListener("input", (e) => flRenderGrid(+e.target.value));
+    flRenderGrid(2010);
     byId("flResult").classList.add("show");
     flStatus("");
   } catch (e) {
