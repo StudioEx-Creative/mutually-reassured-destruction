@@ -19,7 +19,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,75..100,400..900;1,75..100,400..900&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="css/style.css?v=2026r45" />
+    <link rel="stylesheet" href="css/style.css?v=2026r47" />
   </head>
   <body>
     <a class="skip-link" href="#record">Skip to the content</a>
@@ -180,6 +180,26 @@
             <div class="ice-cap">Greenland loses ~270 and Antarctica ~140 billion tonnes a year. <a href="https://climate.nasa.gov/vital-signs/ice-sheets/" target="_blank" rel="noopener">NASA GRACE-FO ↗</a></div>
             <p class="visually-hidden" id="iceDesc">Two counters rising in real time, showing tonnes of ice mass lost from the Greenland and Antarctic ice sheets since the page opened, from NASA satellite annual-loss rates.</p>
           </div>
+
+          <!-- ═══ WHAT THE ARCTIC LOST ═══
+               The September minimum as a shape that used to be bigger. Every
+               ring is a sourced NSIDC year; the dashed 1980 outline stays as
+               the reference, and the dark gap is what has gone. Area-true, and
+               it deliberately shows that 2012 was worse than today — the ice
+               lurches, it does not slide. -->
+          <div class="ice-scene rv" id="iceScene" aria-label="Arctic sea ice at the September minimum, 1980 to 2024">
+            <div class="is-sticky">
+              <canvas id="iceCanvas" role="img"
+                aria-label="The Arctic September sea-ice minimum drawn as nested area-true rings from 1980 to 2024, shrinking against a dashed 1980 outline"
+                aria-describedby="iceSceneDesc"></canvas>
+            </div>
+          </div>
+          <p class="visually-hidden" id="iceSceneDesc">Arctic sea ice at its September minimum, drawn as nested rings whose area is proportional to the extent in million square kilometres. A dashed outline marks where the ice reached in 1980, at 7.7 million square kilometres. Scrolling advances through the sourced years: 1990 at 6.2, 2000 at 6.3, 2007 at 4.27, 2012 at 3.39 — the record low, smaller than today — 2020 at 3.92 and 2024 at 4.28. The gap between the dashed 1980 outline and the present ice is what has been lost. The shape is schematic, not a map.</p>
+          <p class="stripes-cap rv" style="margin-top:.8rem">
+            Arctic sea ice is falling about <b>12% per decade</b> against the 1981–2010 average — but not
+            smoothly. 2012 remains the record low, below today. The trend is the story, not any one year.
+            <a href="https://nsidc.org/sea-ice-today" target="_blank" rel="noopener">NSIDC Sea Ice Index ↗</a>
+          </p>
 
           <!-- forest-cover ribbon (P2-1) -->
           <div class="forest-ribbon-block rv">
@@ -620,16 +640,17 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/config.js?v=2026r45" defer></script>
-    <script src="js/data.js?v=2026r45" defer></script>
-    <script src="js/backend.js?v=2026r45" defer></script>
-    <script src="js/hazard.js?v=2026r45" defer></script>
-    <script src="js/map.js?v=2026r45" defer></script>
-    <script src="js/livingworld.js?v=2026r45" defer></script>
-    <script src="js/cutscene.js?v=2026r45" defer></script>
-    <script src="js/recordrings.js?v=2026r45" defer></script>
-    <script src="js/icecore.js?v=2026r45" defer></script>
-    <script src="js/oceanheat.js?v=2026r45" defer></script>
-    <script src="js/main.js?v=2026r45" defer></script>
+    <script src="js/config.js?v=2026r47" defer></script>
+    <script src="js/data.js?v=2026r47" defer></script>
+    <script src="js/backend.js?v=2026r47" defer></script>
+    <script src="js/hazard.js?v=2026r47" defer></script>
+    <script src="js/map.js?v=2026r47" defer></script>
+    <script src="js/livingworld.js?v=2026r47" defer></script>
+    <script src="js/cutscene.js?v=2026r47" defer></script>
+    <script src="js/recordrings.js?v=2026r47" defer></script>
+    <script src="js/icecore.js?v=2026r47" defer></script>
+    <script src="js/oceanheat.js?v=2026r47" defer></script>
+    <script src="js/arcticice.js?v=2026r47" defer></script>
+    <script src="js/main.js?v=2026r47" defer></script>
   </body>
 </html>
