@@ -940,3 +940,13 @@ body { font-weight: 400; }
 .fl-day { border-radius: 3px; min-height: 34px; }
 .fl-scrub { accent-color: var(--ember); height: 6px; }
 .fl-year { font-size: 2rem; color: var(--ember); }
+
+/* ═══ CH01 · WHERE THE HEAT WENT ═══
+   Pinned drop: 100 units of trapped heat fall, 90 sink into the ocean. */
+.heat-scene { position: relative; height: 280vh; margin: 2.5rem 0 1rem; }  /* TUNE: fall length */
+.hs-sticky { position: sticky; top: 0; height: 100svh; }
+#heatCanvas { width: 100%; height: 100%; display: block; }
+@media (prefers-reduced-motion: reduce) {
+  .heat-scene { height: 72svh; }
+  .hs-sticky { position: static; height: 72svh; }
+}
