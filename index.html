@@ -19,7 +19,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,75..100,400..900;1,75..100,400..900&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="css/style.css?v=2026r54" />
+    <link rel="stylesheet" href="css/style.css?v=2026r57" />
   </head>
   <body>
     <a class="skip-link" href="#record">Skip to the content</a>
@@ -268,6 +268,22 @@
         <div class="wrap">
           <div class="anomaly-strip rv rv-d1">
             <div class="anomaly-strip-h">The same warming, by latitude — Arctic amplification at the top</div>
+
+            <!-- ═══ THE RACE, 1980 → 2020 ═══
+                 "Arctic amplification" explains nothing as a phrase, so scroll
+                 runs it instead: the top band pulls away from the rest and
+                 never comes back. The Earth is split at the real bounds of
+                 each band, so the thinnest sliver on screen is also the one
+                 warming fastest. The static bands below are the fallback. -->
+            <div class="lat-scene" id="latScene">
+              <div class="lat-sticky">
+                <canvas id="latCanvas" role="img"
+                  aria-label="The Earth seen edge-on, divided into latitude bands, with a bar beside each band showing its temperature anomaly. Scrolling runs the decades from 1980 to 2020."
+                  aria-describedby="latDesc"></canvas>
+              </div>
+            </div>
+            <p class="visually-hidden" id="latDesc">The Earth seen edge-on, divided into its latitude bands, with a bar beside each showing that band's temperature anomaly against the 1951 to 1980 baseline. Scrolling advances the decades from 1980 to 2020. Every band warms, but they do not warm together: by the 2020s the Arctic band from 64 to 90 degrees north reaches about +3.0 °C while the band from 64 to 90 degrees south reaches about +0.6 °C, roughly five times less. A dashed line marks the area-weighted mean of the bands shown. The same figures are listed as coloured bands below.</p>
+
             <div class="anomaly-wrap" id="anomalyWrap"></div>
           </div>
           <p class="map-note rv rv-d2">
@@ -654,18 +670,19 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/config.js?v=2026r54" defer></script>
-    <script src="js/data.js?v=2026r54" defer></script>
-    <script src="js/backend.js?v=2026r54" defer></script>
-    <script src="js/hazard.js?v=2026r54" defer></script>
-    <script src="js/map.js?v=2026r54" defer></script>
-    <script src="js/livingworld.js?v=2026r54" defer></script>
-    <script src="js/cutscene.js?v=2026r54" defer></script>
-    <script src="js/recordrings.js?v=2026r54" defer></script>
-    <script src="js/icecore.js?v=2026r54" defer></script>
-    <script src="js/oceanheat.js?v=2026r54" defer></script>
-    <script src="js/arcticice.js?v=2026r54" defer></script>
-    <script src="js/globeledger.js?v=2026r54" defer></script>
-    <script src="js/main.js?v=2026r54" defer></script>
+    <script src="js/config.js?v=2026r57" defer></script>
+    <script src="js/data.js?v=2026r57" defer></script>
+    <script src="js/backend.js?v=2026r57" defer></script>
+    <script src="js/hazard.js?v=2026r57" defer></script>
+    <script src="js/map.js?v=2026r57" defer></script>
+    <script src="js/livingworld.js?v=2026r57" defer></script>
+    <script src="js/cutscene.js?v=2026r57" defer></script>
+    <script src="js/recordrings.js?v=2026r57" defer></script>
+    <script src="js/icecore.js?v=2026r57" defer></script>
+    <script src="js/oceanheat.js?v=2026r57" defer></script>
+    <script src="js/arcticice.js?v=2026r57" defer></script>
+    <script src="js/globeledger.js?v=2026r57" defer></script>
+    <script src="js/latitude.js?v=2026r57" defer></script>
+    <script src="js/main.js?v=2026r57" defer></script>
   </body>
 </html>

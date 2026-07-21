@@ -978,3 +978,16 @@ body { font-weight: 400; }
   .gv-sticky { position: static; height: 70svh; }
   .ledger-tabs-stick { position: static; background: none; }
 }
+
+/* ═══ CH02a · THE SAME WARMING, BY LATITUDE ═══
+   Pinned scrub runs the decades. The canvas is the primary reading; the
+   static coloured bands below it are the reduced-motion fallback. */
+.lat-scene { position: relative; height: 240vh; margin: .6rem 0 1rem; }  /* TUNE: race length */
+.lat-sticky { position: sticky; top: 0; height: 100svh; }
+#latCanvas { width: 100%; height: 100%; display: block; }
+/* under normal motion the canvas is authoritative — don't say it twice */
+.anomaly-strip .anomaly-wrap { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  .lat-scene { display: none; }
+  .anomaly-strip .anomaly-wrap { display: block; }
+}
