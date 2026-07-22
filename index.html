@@ -19,7 +19,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,75..100,400..900;1,75..100,400..900&family=Inter:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="css/style.css?v=2026r57" />
+    <link rel="stylesheet" href="css/style.css?v=2026r58" />
   </head>
   <body>
     <a class="skip-link" href="#record">Skip to the content</a>
@@ -73,6 +73,45 @@
       <div class="scroll-cue fade-up d5">▼ &nbsp; scroll &nbsp; ▼</div>
     </header>
 
+      <!-- ═══ OVERTURE · THE HEADLINE, IN RINGS ═══
+           The master record — global temperature — pulled to the front as
+           the first beat after the title: the hero's living rings become the
+           planet's own growth rings, then unroll into the warming stripes.
+           Every indicator that follows is read against this one. -->
+      <section class="section overture" id="overture">
+        <div class="wrap">
+          <!-- ═══ THE RECORD, IN RINGS → UNROLLED INTO STRIPES ═══
+               The planet's books ARE tree rings — dendroclimatology is how the
+               record is known before thermometers. So the temperature series is
+               drawn as growth rings (1850 at the pith, 2025 at the bark) and
+               scroll unrolls them into Hawkins' stripes. Same numbers, two
+               readings. Under reduced motion this is hidden and the static
+               stripes below are shown instead. -->
+          <div class="stripes-block rv">
+            <div class="stripes-head">
+              <div class="stripes-h">The record, in rings · global temperature, 1850–2025</div>
+              <button class="cvd-toggle" id="cvdToggle" aria-pressed="false" onclick="toggleStripePalette()">High-contrast palette</button>
+            </div>
+            <div class="rr-scene" id="ringScene">
+              <div class="rr-sticky">
+                <canvas id="ringCanvas" role="img"
+                  aria-label="The global temperature record 1850 to 2025 drawn as a tree's growth rings, one ring per year, which unroll into the warming stripes"
+                  aria-describedby="stripesDesc"></canvas>
+              </div>
+            </div>
+            <div class="stripes" id="stripes" role="img" aria-label="Warming stripes: global temperature by year, 1850 to 2025" aria-describedby="stripesDesc"></div>
+            <div class="stripes-axis"><span>1850</span><span>1920</span><span>1970</span><span>2025</span></div>
+            <p class="visually-hidden" id="stripesDesc">Each vertical stripe is one year, coloured by its global mean temperature relative to the 1850–1900 average — deep blue for the coolest years around 1900, through pale tones mid-century, to deep red for the record heat of the 2020s. The overall movement is a steady shift from blue to red, accelerating after 1970.</p>
+            <p class="stripes-cap">
+              Each stripe is one year, coloured by its temperature against the
+              1850–1900 average. The visual concept is Ed Hawkins'
+              <a href="https://showyourstripes.info/" target="_blank" rel="noopener">#ShowYourStripes</a>;
+              data follows the Berkeley Earth annual record.
+            </p>
+          </div>
+        </div>
+      </section>
+
     <!-- ═══ CHAPTER NAV ═══ -->
     <nav class="itin rv" aria-label="Chapters">
       <div class="itin-track">
@@ -106,36 +145,6 @@
 
           <div class="card-grid rv rv-d2" id="cardGrid"></div>
 
-          <!-- ═══ THE RECORD, IN RINGS → UNROLLED INTO STRIPES ═══
-               The planet's books ARE tree rings — dendroclimatology is how the
-               record is known before thermometers. So the temperature series is
-               drawn as growth rings (1850 at the pith, 2025 at the bark) and
-               scroll unrolls them into Hawkins' stripes. Same numbers, two
-               readings. Under reduced motion this is hidden and the static
-               stripes below are shown instead. -->
-          <div class="stripes-block rv">
-            <div class="stripes-head">
-              <div class="stripes-h">The record, in rings · global temperature, 1850–2025</div>
-              <button class="cvd-toggle" id="cvdToggle" aria-pressed="false" onclick="toggleStripePalette()">High-contrast palette</button>
-            </div>
-            <div class="rr-scene" id="ringScene">
-              <div class="rr-sticky">
-                <canvas id="ringCanvas" role="img"
-                  aria-label="The global temperature record 1850 to 2025 drawn as a tree's growth rings, one ring per year, which unroll into the warming stripes"
-                  aria-describedby="stripesDesc"></canvas>
-              </div>
-            </div>
-            <div class="stripes" id="stripes" role="img" aria-label="Warming stripes: global temperature by year, 1850 to 2025" aria-describedby="stripesDesc"></div>
-            <div class="stripes-axis"><span>1850</span><span>1920</span><span>1970</span><span>2025</span></div>
-            <p class="visually-hidden" id="stripesDesc">Each vertical stripe is one year, coloured by its global mean temperature relative to the 1850–1900 average — deep blue for the coolest years around 1900, through pale tones mid-century, to deep red for the record heat of the 2020s. The overall movement is a steady shift from blue to red, accelerating after 1970.</p>
-            <p class="stripes-cap">
-              Each stripe is one year, coloured by its temperature against the
-              1850–1900 average. The visual concept is Ed Hawkins'
-              <a href="https://showyourstripes.info/" target="_blank" rel="noopener">#ShowYourStripes</a>;
-              data follows the Berkeley Earth annual record.
-            </p>
-          </div>
-
           <!-- ═══ THE ICE CORE · the archive that is also melting ═══
                The second of the planet's books. Tree rings hold the temperature;
                ice holds the AIR — real bubbles of the real atmosphere, sealed the
@@ -149,6 +158,17 @@
             </div>
           </div>
           <p class="visually-hidden" id="coreDesc">An ice core is drawn as a cylinder of layered ice holding bubbles of trapped air — the actual atmosphere, sealed in the year the snow fell. Depth reads as time, with now at the top. Beside it, the carbon dioxide the core carries is traced: a long flat line at about 280 parts per million for the air before us, then, above a declared scale break, the real instrumental record from 1958 climbing steeply to 430.5 parts per million in May 2025, the first month above 430.</p>
+
+          <!-- ice-mass-balance dual counter (P2-1) — now the turn: the archive is melting -->
+          <div class="ice-counter rv" role="img" aria-label="Live counter of ice lost from Greenland and Antarctica since this page opened" aria-describedby="iceDesc">
+            <div class="ice-counter-h">And the archive is melting · since you opened this page</div>
+            <div class="ice-counter-grid">
+              <div class="ice-col"><div class="ice-num" id="iceGreenland">0</div><div class="ice-lbl">tonnes · Greenland</div></div>
+              <div class="ice-col"><div class="ice-num" id="iceAntarctica">0</div><div class="ice-lbl">tonnes · Antarctica</div></div>
+            </div>
+            <div class="ice-cap">Greenland loses ~270 and Antarctica ~140 billion tonnes a year. <a href="https://climate.nasa.gov/vital-signs/ice-sheets/" target="_blank" rel="noopener">NASA GRACE-FO ↗</a></div>
+            <p class="visually-hidden" id="iceDesc">Two counters rising in real time, showing tonnes of ice mass lost from the Greenland and Antarctic ice sheets since the page opened, from NASA satellite annual-loss rates.</p>
+          </div>
 
           <!-- ═══ WHERE THE HEAT WENT ═══
                Promotes the most under-told number on the page out of a small
@@ -170,36 +190,7 @@
             <a href="https://www.ncei.noaa.gov/access/global-ocean-heat-content/" target="_blank" rel="noopener">NOAA NCEI / Cheng et al. ↗</a>
           </p>
 
-          <!-- ice-mass-balance dual counter (P2-1) — now the turn: the archive is melting -->
-          <div class="ice-counter rv" role="img" aria-label="Live counter of ice lost from Greenland and Antarctica since this page opened" aria-describedby="iceDesc">
-            <div class="ice-counter-h">And the archive is melting · since you opened this page</div>
-            <div class="ice-counter-grid">
-              <div class="ice-col"><div class="ice-num" id="iceGreenland">0</div><div class="ice-lbl">tonnes · Greenland</div></div>
-              <div class="ice-col"><div class="ice-num" id="iceAntarctica">0</div><div class="ice-lbl">tonnes · Antarctica</div></div>
-            </div>
-            <div class="ice-cap">Greenland loses ~270 and Antarctica ~140 billion tonnes a year. <a href="https://climate.nasa.gov/vital-signs/ice-sheets/" target="_blank" rel="noopener">NASA GRACE-FO ↗</a></div>
-            <p class="visually-hidden" id="iceDesc">Two counters rising in real time, showing tonnes of ice mass lost from the Greenland and Antarctic ice sheets since the page opened, from NASA satellite annual-loss rates.</p>
-          </div>
 
-          <!-- ═══ WHAT THE ARCTIC LOST ═══
-               The September minimum as a shape that used to be bigger. Every
-               ring is a sourced NSIDC year; the dashed 1980 outline stays as
-               the reference, and the dark gap is what has gone. Area-true, and
-               it deliberately shows that 2012 was worse than today — the ice
-               lurches, it does not slide. -->
-          <div class="ice-scene rv" id="iceScene" aria-label="Arctic sea ice at the September minimum, 1980 to 2024">
-            <div class="is-sticky">
-              <canvas id="iceCanvas" role="img"
-                aria-label="The Arctic September sea-ice minimum drawn as nested area-true rings from 1980 to 2024, shrinking against a dashed 1980 outline"
-                aria-describedby="iceSceneDesc"></canvas>
-            </div>
-          </div>
-          <p class="visually-hidden" id="iceSceneDesc">Arctic sea ice at its September minimum, drawn as nested rings whose area is proportional to the extent in million square kilometres. A dashed outline marks where the ice reached in 1980, at 7.7 million square kilometres. Scrolling advances through the sourced years: 1990 at 6.2, 2000 at 6.3, 2007 at 4.27, 2012 at 3.39 — the record low, smaller than today — 2020 at 3.92 and 2024 at 4.28. The gap between the dashed 1980 outline and the present ice is what has been lost. The shape is schematic, not a map.</p>
-          <p class="stripes-cap rv" style="margin-top:.8rem">
-            Arctic sea ice is falling about <b>12% per decade</b> against the 1981–2010 average — but not
-            smoothly. 2012 remains the record low, below today. The trend is the story, not any one year.
-            <a href="https://nsidc.org/sea-ice-today" target="_blank" rel="noopener">NSIDC Sea Ice Index ↗</a>
-          </p>
 
           <!-- forest-cover ribbon (P2-1) -->
           <div class="forest-ribbon-block rv">
@@ -293,6 +284,25 @@
             Forest hotspots: <a href="https://www.wri.org/" target="_blank" rel="noopener">Global Forest Watch 2024</a>.
             Attribution pins: <a href="https://www.worldweatherattribution.org/" target="_blank" rel="noopener">World Weather Attribution</a>.
             Basemap © <a href="https://carto.com/attributions" target="_blank" rel="noopener">CARTO</a>, © OpenStreetMap. Active fires (NASA FIRMS) and cyclones (NOAA NHC) need an API key — wiring noted in the repo.
+          </p>
+          <!-- ═══ WHAT THE ARCTIC LOST ═══
+               The September minimum as a shape that used to be bigger. Every
+               ring is a sourced NSIDC year; the dashed 1980 outline stays as
+               the reference, and the dark gap is what has gone. Area-true, and
+               it deliberately shows that 2012 was worse than today — the ice
+               lurches, it does not slide. -->
+          <div class="ice-scene rv" id="iceScene" aria-label="Arctic sea ice at the September minimum, 1980 to 2024">
+            <div class="is-sticky">
+              <canvas id="iceCanvas" role="img"
+                aria-label="The Arctic September sea-ice minimum drawn as nested area-true rings from 1980 to 2024, shrinking against a dashed 1980 outline"
+                aria-describedby="iceSceneDesc"></canvas>
+            </div>
+          </div>
+          <p class="visually-hidden" id="iceSceneDesc">Arctic sea ice at its September minimum, drawn as nested rings whose area is proportional to the extent in million square kilometres. A dashed outline marks where the ice reached in 1980, at 7.7 million square kilometres. Scrolling advances through the sourced years: 1990 at 6.2, 2000 at 6.3, 2007 at 4.27, 2012 at 3.39 — the record low, smaller than today — 2020 at 3.92 and 2024 at 4.28. The gap between the dashed 1980 outline and the present ice is what has been lost. The shape is schematic, not a map.</p>
+          <p class="stripes-cap rv" style="margin-top:.8rem">
+            Arctic sea ice is falling about <b>12% per decade</b> against the 1981–2010 average — but not
+            smoothly. 2012 remains the record low, below today. The trend is the story, not any one year.
+            <a href="https://nsidc.org/sea-ice-today" target="_blank" rel="noopener">NSIDC Sea Ice Index ↗</a>
           </p>
         </div>
       </section>
@@ -670,19 +680,19 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/config.js?v=2026r57" defer></script>
-    <script src="js/data.js?v=2026r57" defer></script>
-    <script src="js/backend.js?v=2026r57" defer></script>
-    <script src="js/hazard.js?v=2026r57" defer></script>
-    <script src="js/map.js?v=2026r57" defer></script>
-    <script src="js/livingworld.js?v=2026r57" defer></script>
-    <script src="js/cutscene.js?v=2026r57" defer></script>
-    <script src="js/recordrings.js?v=2026r57" defer></script>
-    <script src="js/icecore.js?v=2026r57" defer></script>
-    <script src="js/oceanheat.js?v=2026r57" defer></script>
-    <script src="js/arcticice.js?v=2026r57" defer></script>
-    <script src="js/globeledger.js?v=2026r57" defer></script>
-    <script src="js/latitude.js?v=2026r57" defer></script>
-    <script src="js/main.js?v=2026r57" defer></script>
+    <script src="js/config.js?v=2026r58" defer></script>
+    <script src="js/data.js?v=2026r58" defer></script>
+    <script src="js/backend.js?v=2026r58" defer></script>
+    <script src="js/hazard.js?v=2026r58" defer></script>
+    <script src="js/map.js?v=2026r58" defer></script>
+    <script src="js/livingworld.js?v=2026r58" defer></script>
+    <script src="js/cutscene.js?v=2026r58" defer></script>
+    <script src="js/recordrings.js?v=2026r58" defer></script>
+    <script src="js/icecore.js?v=2026r58" defer></script>
+    <script src="js/oceanheat.js?v=2026r58" defer></script>
+    <script src="js/arcticice.js?v=2026r58" defer></script>
+    <script src="js/globeledger.js?v=2026r58" defer></script>
+    <script src="js/latitude.js?v=2026r58" defer></script>
+    <script src="js/main.js?v=2026r58" defer></script>
   </body>
 </html>
